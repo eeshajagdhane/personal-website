@@ -1,0 +1,14 @@
+project:
+  type: website
+  output-dir: docs
+  render:
+    - "*.qmd"
+
+website:
+  title: "Eesha Jagdhane"
+  navbar: false
+
+format:
+  html:
+    theme: none
+    toc: false
