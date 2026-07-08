@@ -400,17 +400,17 @@ execute:
   <div class="section-label">What I've Done</div>
   <div class="section-title">Work <span class="outlined">Experience</span></div>
   <div class="exp-item">
-    <div class="exp-date">Mar 2026 – Present</div>
+    <div class="exp-date">Mar 2026 – Jun 2026</div>
     <div>
       <div class="exp-title">AI Engineer</div>
       <div class="exp-company">Dhauz | QuantumRise — San Diego, CA, U.S.A</div>
-      <div class="exp-desc">In this capstone project, I’ve taken on both a technical and team-facing role. As an AI Engineer, I help develop an agentic AI solution aimed at making nurses’ day-to-day work easier by giving them quicker access to patient information, clinical context, and early alerts for deterioration risks. My work involves supporting the technical direction of the project, exploring the MIMIC-IV dataset, and contributing to how we structure the Python- and SQL-based solution behind the prototype. At the same time, I serve as the key communicator for the team, which means I put together our weekly presentations, draft meeting agendas, and handle communication with the Dhauz | Quantumrise team. I’ve really enjoyed being in a role where I can contribute both to the technical side of the project and to making sure our team stays organized, aligned, and professional in how we work with stakeholders.</div>
+      <div class="exp-desc">In my MSBA capstone with Dhauz AI Consulting and Quantum Rise, I work at the intersection of business requirements, healthcare workflows, and technical implementation. I translate nurse workflows into user stories, alert logic, and usability criteria for a Telegram-based AI prototype designed to support patient deterioration monitoring. I also coordinate weekly agendas, presentations, and recap emails across client, partner, and UCSD stakeholders to clarify open questions, align technical decisions with end-user needs, and keep the project moving toward implementation.tential for earlier intervention, lower care costs, reduced ICU escalations, and improved nurse retention.</div>
     </div>
     <div class="exp-badges">
-      <span class="badge">AI Tools</span>
+      <span class="badge">GenAI</span>
       <span class="badge">SQL</span>
       <span class="badge">Python</span>
-      <span class="badge">PowerPoint Presentation</span>
+      <span class="badge">AI Tools</span>
     </div>
   </div>
   <div class="exp-item">
@@ -418,7 +418,7 @@ execute:
     <div>
       <div class="exp-title">Data Analyst</div>
       <div class="exp-company">Morningstar DBRS — Chicago, IL, U.S.A</div>
-      <div class="exp-desc">Designed and implemented 20+ Tableau flows and databases providing accurate, decision-ready data for team analysis. Using Excel, Python, and SQL, built and validated schemas, automated recurring data ingestion, validation, and dashboard refreshes. Integrated climate risk data through an API into the ratings workflow on an ESG initiative. Documented methods, presented insights to stakeholders, and created process guides that helped onboard more than three new team members.</div>
+      <div class="exp-desc">As a Data Analyst at Morningstar DBRS, I improved reporting workflows, data quality, and stakeholder visibility across structured finance teams. I standardized 20+ Tableau Prep workflows and dashboards by translating stakeholder reporting needs into reusable metrics, filters, and documentation, giving 10+ teams self-service access to deal inflow and issuance insights. I also validated SQL, Python, and Excel reporting workflows by reconciling source data to dashboard outputs, debugging metric inconsistencies, and improving trust in reporting used by internal business teams.</div>
     </div>
     <div class="exp-badges">
       <span class="badge">SQL</span>
@@ -431,11 +431,24 @@ execute:
     <div>
       <div class="exp-title">Credit Ratings Analyst</div>
       <div class="exp-company">Morningstar DBRS — Chicago, IL, U.S.A</div>
-      <div class="exp-desc">Used advanced Excel and statistical analysis to model net cash flows and support investment decisions. Maintained 99% accuracy in a fast-paced deal environment by adapting quickly to revisions and staying highly detail-oriented. Consolidated complex files and data sources into a single auditable repository, streamlining workflows and improving turnaround times.</div>
+      <div class="exp-desc">As a Credit Ratings Analyst at Morningstar DBRS, I supported credit decision-making through quantitative financial analysis, scenario modeling, and disciplined quality checks. I performed 15+ cash flow and scenario analyses across multiple commercial real estate property types under tight deadlines and high-volume deal flow. I maintained 99% accuracy across complex financial models through structured QA reviews, attention to detail, and consistent validation of assumptions and outputs.</div>
     </div>
     <div class="exp-badges">
       <span class="badge">Excel</span>
       <span class="badge">SQL</span>
+    </div>
+  </div>
+  <div class="exp-item">
+    <div class="exp-date">Jun 2021 – Jul 2021</div>
+    <div>
+      <div class="exp-title">Machine Learning Intern</div>
+      <div class="exp-company">Centre for Development of Advanced Computing</div>
+      <div class="exp-desc">As a Machine Learning Intern at CDAC, I supported an image distortion recognition project focused on incremental learning and similarity-based image comparison. I developed a beta incremental learning model using NumPy, Pandas, TensorFlow, and Keras to support continuous model updates as new image data was introduced, achieving 0.981 testing accuracy and 0.999 training accuracy. I also implemented a similarity-index approach to compare original and distorted images, strengthening my experience in model development, data preprocessing, and technical experimentation.</div>
+    </div>
+    <div class="exp-badges">
+      <span class="badge">Python</span>
+      <span class="badge">TensorFlow</span>
+      <span class="badge">Keras</span>
     </div>
   </div>
 </div>
