@@ -199,8 +199,8 @@ execute:
 <div class="page-header">
   <div class="page-title">Blogs &amp; <span class="outlined">Insights</span></div>
   <p class="page-sub">
-    A collection of assignments, analyses, and reflections from my Marketing Analytics
-    coursework at UC San Diego.
+    A collection of projects, experiments, and reflections — from personal builds and
+    GitHub work to the ideas I'm exploring and learning along the way.
   </p>
 </div>
 
