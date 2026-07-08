@@ -330,6 +330,8 @@ execute:
           <span class="skill-tag">Excel</span>
           <span class="skill-tag">R</span>
           <span class="skill-tag">Databricks</span>
+          <span class="skill-tag">TensorFlow</span>
+          <span class="skill-tag">Keras</span>
         </div>
       </div>
       <div class="skills-group">
