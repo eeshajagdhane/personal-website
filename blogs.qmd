@@ -206,7 +206,7 @@ execute:
   <div class="blog-empty">
     <div class="blog-empty-title">More coming soon</div>
     <p class="blog-empty-desc">
-      New writing, analyses, and reflections will be published here. Check back soon.
+      New writing, analyses, and reflections will be published here soon. Stay tuned!
     </p>
   </div>
 </div>
