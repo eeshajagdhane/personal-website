@@ -1,0 +1,70 @@
+---
+pagetitle: "Contact"
+---
+
+```{=html}
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand">EJ.</a>
+    <ul class="nav-links">
+      <li><a href="about.html">About</a></li>
+      <li><a href="experience.html">Experience</a></li>
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="hobbies.html">Hobbies</a></li>
+      <li><a href="insights.html">Insights</a></li>
+    </ul>
+    <a href="contact.html" class="btn-dark">Get in touch</a>
+  </div>
+</nav>
+
+<main>
+<div class="page reveal">
+  <div class="eyebrow page-eyebrow">Contact</div>
+  <h1 class="page-title">Let's talk about <em>data, decisions</em>, and what's next.</h1>
+  <p class="page-intro">
+    I'm actively looking for full-time roles in Data / Business Analytics, Data Science,
+    Data Engineering, and AI Engineering — with a particular interest in Tech, FinTech,
+    and Venture Capital.
+  </p>
+
+  <div class="contact-grid">
+    <a href="mailto:ejagdhane99@gmail.com" class="contact-card">
+      <span class="contact-card-label">Email</span>
+      <span class="contact-card-value">ejagdhane99@gmail.com →</span>
+    </a>
+    <a href="https://linkedin.com/in/eesha-jagdhane" target="_blank" rel="noopener" class="contact-card">
+      <span class="contact-card-label">LinkedIn</span>
+      <span class="contact-card-value">linkedin.com/in/eesha-jagdhane →</span>
+    </a>
+    <a href="https://github.com/eeshajagdhane?tab=repositories" target="_blank" rel="noopener" class="contact-card">
+      <span class="contact-card-label">GitHub</span>
+      <span class="contact-card-value">github.com/eeshajagdhane →</span>
+    </a>
+    <a href="resume.pdf" target="_blank" rel="noopener" class="contact-card">
+      <span class="contact-card-label">Resume</span>
+      <span class="contact-card-value">Download PDF →</span>
+    </a>
+  </div>
+</div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>Based in San Diego, CA · UCSD MS Business Analytics</span>
+    <div class="footer-links">
+      <a href="https://linkedin.com/in/eesha-jagdhane" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://github.com/eeshajagdhane?tab=repositories" target="_blank" rel="noopener">GitHub</a>
+      <a href="mailto:ejagdhane99@gmail.com">Email</a>
+      <a href="resume.pdf" target="_blank" rel="noopener">Resume</a>
+    </div>
+    <span>© 2026 Eesha Jagdhane</span>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+```

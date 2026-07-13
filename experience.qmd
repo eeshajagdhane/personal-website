@@ -1,0 +1,122 @@
+---
+pagetitle: "Experience"
+---
+
+```{=html}
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand">EJ.</a>
+    <ul class="nav-links">
+      <li><a href="about.html">About</a></li>
+      <li><a href="experience.html" class="active">Experience</a></li>
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="hobbies.html">Hobbies</a></li>
+      <li><a href="insights.html">Insights</a></li>
+    </ul>
+    <a href="contact.html" class="btn-dark">Get in touch</a>
+  </div>
+</nav>
+
+<main>
+<div class="page reveal">
+  <div class="eyebrow page-eyebrow">Experience</div>
+  <h1 class="page-title">A working timeline.</h1>
+
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-when">Mar 2026 — Jun 2026</div>
+      <div class="tl-title">AI Engineer</div>
+      <div class="tl-org">Dhauz | QuantumRise — San Diego, CA</div>
+      <div class="tl-desc">
+        In my MSBA capstone with Dhauz AI Consulting and QuantumRise, I work at the intersection
+        of business requirements, healthcare workflows, and technical implementation. I translate
+        nurse workflows into user stories, alert logic, and usability criteria for a Telegram-based
+        AI prototype designed to support patient-deterioration monitoring. I also coordinate weekly
+        agendas, presentations, and recap emails across client, partner, and UCSD stakeholders to
+        align technical decisions with end-user needs and keep the project moving toward implementation.
+      </div>
+      <div class="tl-badges">
+        <span class="tl-badge">GenAI</span>
+        <span class="tl-badge">SQL</span>
+        <span class="tl-badge">Python</span>
+        <span class="tl-badge">AI Tools</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-when">Apr 2023 — Jun 2025</div>
+      <div class="tl-title">Data Analyst</div>
+      <div class="tl-org">Morningstar DBRS — Chicago, IL</div>
+      <div class="tl-desc">
+        Improved reporting workflows, data quality, and stakeholder visibility across structured
+        finance teams. I standardized 20+ Tableau Prep workflows and dashboards by translating
+        stakeholder reporting needs into reusable metrics, filters, and documentation — giving
+        10+ teams self-service access to deal-inflow and issuance insights. I also validated SQL,
+        Python, and Excel reporting workflows by reconciling source data to dashboard outputs,
+        debugging metric inconsistencies, and improving trust in internal reporting.
+      </div>
+      <div class="tl-badges">
+        <span class="tl-badge">SQL</span>
+        <span class="tl-badge">Python</span>
+        <span class="tl-badge">Tableau</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-when">Jul 2022 — Apr 2023</div>
+      <div class="tl-title">Credit Ratings Analyst</div>
+      <div class="tl-org">Morningstar DBRS — Chicago, IL</div>
+      <div class="tl-desc">
+        Supported credit decision-making through quantitative financial analysis, scenario modeling,
+        and disciplined quality checks. I performed 15+ cash-flow and scenario analyses across
+        multiple commercial real estate property types under tight deadlines and high-volume deal
+        flow, maintaining 99% accuracy across complex financial models through structured QA reviews
+        and consistent validation of assumptions and outputs.
+      </div>
+      <div class="tl-badges">
+        <span class="tl-badge">Excel</span>
+        <span class="tl-badge">SQL</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-when">Jun 2021 — Jul 2021</div>
+      <div class="tl-title">Machine Learning Intern</div>
+      <div class="tl-org">Centre for Development of Advanced Computing (CDAC)</div>
+      <div class="tl-desc">
+        Supported an image-distortion recognition project focused on incremental learning and
+        similarity-based image comparison. I developed a beta incremental-learning model using
+        NumPy, Pandas, TensorFlow, and Keras to support continuous model updates as new image data
+        was introduced, achieving 0.981 testing and 0.999 training accuracy. I also implemented a
+        similarity-index approach to compare original and distorted images.
+      </div>
+      <div class="tl-badges">
+        <span class="tl-badge">Python</span>
+        <span class="tl-badge">TensorFlow</span>
+        <span class="tl-badge">Keras</span>
+      </div>
+    </div>
+  </div>
+</div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>Based in San Diego, CA · UCSD MS Business Analytics</span>
+    <div class="footer-links">
+      <a href="https://linkedin.com/in/eesha-jagdhane" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://github.com/eeshajagdhane?tab=repositories" target="_blank" rel="noopener">GitHub</a>
+      <a href="mailto:ejagdhane99@gmail.com">Email</a>
+      <a href="resume.pdf" target="_blank" rel="noopener">Resume</a>
+    </div>
+    <span>© 2026 Eesha Jagdhane</span>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+```

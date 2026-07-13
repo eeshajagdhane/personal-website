@@ -1,0 +1,70 @@
+---
+pagetitle: "Insights"
+---
+
+```{=html}
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand">EJ.</a>
+    <ul class="nav-links">
+      <li><a href="about.html">About</a></li>
+      <li><a href="experience.html">Experience</a></li>
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="hobbies.html">Hobbies</a></li>
+      <li><a href="insights.html" class="active">Insights</a></li>
+    </ul>
+    <a href="contact.html" class="btn-dark">Get in touch</a>
+  </div>
+</nav>
+
+<main>
+<div class="page reveal">
+  <div class="eyebrow page-eyebrow">Insights</div>
+  <h1 class="page-title">Notes, essays, and lessons.</h1>
+  <p class="page-intro">
+    Short writing on analytics, AI, and the messy middle of turning data into decisions.
+  </p>
+
+  <div class="insight-list">
+    <div class="insight-item">
+      <div class="insight-tag">Coming soon</div>
+      <div class="insight-title">Notes on analytics, AI, and a career in tech</div>
+      <div class="insight-desc">
+        Reflections on what I'm learning at UCSD, the tools I'm picking up, and how I think about
+        framing data problems in the real world.
+      </div>
+      <a href="#" class="arrow-link">Read →</a>
+    </div>
+    <div class="insight-item">
+      <div class="insight-tag">Coming soon</div>
+      <div class="insight-title">Building trustworthy reporting</div>
+      <div class="insight-desc">
+        Lessons from standardizing dashboards and reconciling data at Morningstar — what makes a
+        metric worth trusting.
+      </div>
+      <a href="#" class="arrow-link">Read →</a>
+    </div>
+  </div>
+</div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>Based in San Diego, CA · UCSD MS Business Analytics</span>
+    <div class="footer-links">
+      <a href="https://linkedin.com/in/eesha-jagdhane" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://github.com/eeshajagdhane?tab=repositories" target="_blank" rel="noopener">GitHub</a>
+      <a href="mailto:ejagdhane99@gmail.com">Email</a>
+      <a href="resume.pdf" target="_blank" rel="noopener">Resume</a>
+    </div>
+    <span>© 2026 Eesha Jagdhane</span>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+```

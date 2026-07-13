@@ -1,0 +1,92 @@
+---
+pagetitle: "Hobbies"
+---
+
+```{=html}
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="index.html" class="brand">EJ.</a>
+    <ul class="nav-links">
+      <li><a href="about.html">About</a></li>
+      <li><a href="experience.html">Experience</a></li>
+      <li><a href="projects.html">Projects</a></li>
+      <li><a href="hobbies.html" class="active">Hobbies</a></li>
+      <li><a href="insights.html">Insights</a></li>
+    </ul>
+    <a href="contact.html" class="btn-dark">Get in touch</a>
+  </div>
+</nav>
+
+<main>
+<div class="page page-lg reveal">
+  <div class="eyebrow page-eyebrow">Hobbies</div>
+  <h1 class="page-title">Curiosities that<br>show up in my work.</h1>
+  <p class="page-intro">
+    These aren't unrelated to the analytical work — they're where I practice noticing
+    patterns without a spreadsheet in front of me.
+  </p>
+
+  <div class="hobby-grid">
+    <div class="hobby-card">
+      <div class="hobby-title">Cooking &amp; baking</div>
+      <div class="hobby-desc">
+        I've been cooking and baking since sixth grade, and I'm a big foodie — always trying new
+        restaurants and dishes around San Diego. A few favorites: Seneca, Callie, Taco Stand,
+        Din Tai Fung, and Ramen Nagi.
+      </div>
+    </div>
+    <div class="hobby-card">
+      <div class="hobby-title">Reading</div>
+      <div class="hobby-desc">
+        Fiction and mystery mostly, though I'm open to almost anything. Lately I've been drawn to
+        books that help me step away from work and assignments for a bit.
+      </div>
+    </div>
+    <div class="hobby-card">
+      <div class="hobby-title">Art &amp; sketching</div>
+      <div class="hobby-desc">
+        I started college as a studio arts major before switching to finance and data analytics,
+        so painting and sketching have always been part of who I am — and creativity still shapes
+        how I work.
+      </div>
+    </div>
+    <div class="hobby-card">
+      <div class="hobby-title">Gaming</div>
+      <div class="hobby-desc">
+        A big fan of video games — I've played all the Uncharted games, some Call of Duty, and
+        especially love co-op adventures like It Takes Two, Split Fiction, Mario Kart, and Overcooked.
+      </div>
+    </div>
+  </div>
+
+  <div class="photo-grid">
+    <img src="Pictures/Food1.jpeg" alt="Food">
+    <img src="Pictures/Painting.jpeg" alt="Painting">
+    <img src="Pictures/Food2.jpeg" alt="Food">
+    <img src="Pictures/Paint%202.jpeg" alt="Painting">
+    <img src="Pictures/Food3.jpeg" alt="Food">
+    <img src="Pictures/paint%203.jpeg" alt="Painting">
+  </div>
+</div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>Based in San Diego, CA · UCSD MS Business Analytics</span>
+    <div class="footer-links">
+      <a href="https://linkedin.com/in/eesha-jagdhane" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://github.com/eeshajagdhane?tab=repositories" target="_blank" rel="noopener">GitHub</a>
+      <a href="mailto:ejagdhane99@gmail.com">Email</a>
+      <a href="resume.pdf" target="_blank" rel="noopener">Resume</a>
+    </div>
+    <span>© 2026 Eesha Jagdhane</span>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+</script>
+```

@@ -11,4 +11,11 @@ website:
 format:
   html:
     theme: none
+    css: styles.css
     toc: false
+    page-layout: full
+    minimal: true
+    anchor-sections: false
+    include-in-header:
+      text: |
+        <meta name="viewport" content="width=device-width, initial-scale=1">
