@@ -63,9 +63,9 @@ pagetitle: "Hobbies"
     <img src="Pictures/Food1.jpeg" alt="Food">
     <img src="Pictures/Painting.jpeg" alt="Painting">
     <img src="Pictures/Food2.jpeg" alt="Food">
-    <img src="Pictures/Paint%202.jpeg" alt="Painting">
+    <img src="Pictures/paint2.jpeg" alt="Painting">
     <img src="Pictures/Food3.jpeg" alt="Food">
-    <img src="Pictures/paint%203.jpeg" alt="Painting">
+    <img src="Pictures/paint3.jpeg" alt="Painting">
   </div>
 </div>
 </main>
