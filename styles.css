@@ -354,7 +354,7 @@ main { display: block; }
 }
 
 .prose { margin-top: 2.4rem; }
-.prose p { font-size: 1.125rem; color: var(--body); line-height: 1.7; margin-bottom: 1.4rem; max-width: 62ch; }
+.prose p { font-size: 1.125rem; color: var(--body); line-height: 1.7; margin-bottom: 1.4rem; max-width: none; }
 .prose p:last-child { margin-bottom: 0; }
 .prose strong { color: var(--ink); font-weight: 500; }
 .prose em { font-style: italic; }
