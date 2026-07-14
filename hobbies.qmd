@@ -30,31 +30,25 @@ pagetitle: "Hobbies"
     <div class="hobby-card">
       <div class="hobby-title">Cooking &amp; baking</div>
       <div class="hobby-desc">
-        I've been cooking and baking since sixth grade, and I'm a big foodie — always trying new
-        restaurants and dishes around San Diego. A few favorites: Seneca, Callie, Taco Stand,
-        Din Tai Fung, and Ramen Nagi.
+        I’ve been cooking and baking since sixth grade, and I’m still always trying new restaurants and dishes around San Diego. Cooking has taught me that small details—timing, consistency, and careful adjustments—can change the entire result. I bring that same attention to my data work, whether I’m validating an output, cleaning a dataset, or finding a better solution when the original request is not possible. Some of my favorite spots are Seneca, Callie, Taco Stand, Din Tai Fung, and Ramen Nagi.
       </div>
     </div>
     <div class="hobby-card">
       <div class="hobby-title">Reading</div>
       <div class="hobby-desc">
-        Fiction and mystery mostly, though I'm open to almost anything. Lately I've been drawn to
-        books that help me step away from work and assignments for a bit.
+        I am drawn to fiction and mysteries because I enjoy following scattered clues until they form a clear story. That same instinct shows up in my analytical work: I like taking information that feels disconnected or complicated and structuring it into something understandable, useful, and easy for others to follow.
       </div>
     </div>
     <div class="hobby-card">
       <div class="hobby-title">Art &amp; sketching</div>
       <div class="hobby-desc">
-        I started college as a studio arts major before switching to finance and data analytics,
-        so painting and sketching have always been part of who I am — and creativity still shapes
-        how I work.
+        My background in studio art taught me to look at something from different angles and imagine how it could work better. I often carry that mindset into my work by quietly redesigning inefficient processes, improving how information is organized, or creating a more intuitive way for someone to complete a task.
       </div>
     </div>
     <div class="hobby-card">
       <div class="hobby-title">Gaming</div>
       <div class="hobby-desc">
-        A big fan of video games — I've played all the Uncharted games, some Call of Duty, and
-        especially love co-op adventures like It Takes Two, Split Fiction, Mario Kart, and Overcooked.
+        Games have taught me to stay patient with difficult problems, test different approaches, and keep going until I find a way forward. I care about completing the full experience—not just getting to the end, but making sure everything works as expected. That persistence shows up in how I troubleshoot, quality-check, and deliver analytical work.
       </div>
     </div>
   </div>
