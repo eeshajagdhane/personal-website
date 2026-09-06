@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Phantom churners – Eesha Jagdhane</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+</style>
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body>
+
+
+
+
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="brand">EJ.</a>
+    <ul class="nav-links">
+      <li><a href="../about.html">About</a></li>
+      <li><a href="../experience.html">Experience</a></li>
+      <li><a href="../projects.html">Projects</a></li>
+      <li><a href="../hobbies.html">Hobbies</a></li>
+      <li><a href="../insights.html" class="active">Insights</a></li>
+    </ul>
+    <a href="../contact.html" class="btn-dark">Get in touch</a>
+  </div>
+</nav>
+
+<main><header id="title-block-header" class="quarto-title-block"></header>
+<div class="page page-article reveal">
+  <a href="../insights.html" class="arrow-link article-back">← Insights</a>
+
+  <div class="eyebrow page-eyebrow">Customer Analytics · Case Study</div>
+  <h1 class="page-title">Phantom churners</h1>
+  <p class="article-deck">
+    My churn model scored an AUC of 0.79 and ranked customers beautifully. It also
+    predicted that <em>12,180</em> of 30,000 subscribers were about to leave, in a market where the
+    real number was closer to 700. Both things were true at once — and only one of them mattered for
+    the budget.
+  </p>
+
+  <dl class="article-meta">
+    <div><dt>Role</dt><dd>Analyst</dd></div>
+    <div><dt>Case</dt><dd>Telecom churn &amp; retention economics</dd></div>
+    <div><dt>Stack</dt><dd>Python · polars · pyrsm · XGBoost</dd></div>
+    <div><dt>Course</dt><dd>MGTA 455, Rady School of Management</dd></div>
+  </dl>
+
+  <section class="article-section">
+    <h2>The assignment</h2>
+    <p>A Singapore mobile carrier wanted to know which retention programs to fund. The chain of
+    reasoning is standard: predict who will churn, work out which interventions move that number,
+    convert the movement into lifetime value, and set a budget from there.</p>
+    <p>Every step after the first depends on the model producing a <strong>probability</strong>, not
+    just a ranking. That distinction is the whole story here.</p>
+  </section>
+
+  <section class="article-section">
+    <h2>Picking a model</h2>
+    <p>I compared logistic regression against two tree ensembles on a 39,000-row training sample,
+    using log transforms on the skewed spend and usage variables:</p>
+  </section>
+
+  <div class="article-tbl-wrap">
+    
+<table class="article-table caption-top">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">Model</th>
+<th data-quarto-table-cell-role="th">AUC</th>
+<th data-quarto-table-cell-role="th">Note</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Logistic regression</td>
+<td>≈0.70</td>
+<td>Baseline, transformed features</td>
+</tr>
+<tr class="even">
+<td>Random forest</td>
+<td>0.713</td>
+<td>Untuned</td>
+</tr>
+<tr class="odd">
+<td>Random forest (tuned)</td>
+<td>0.727</td>
+<td></td>
+</tr>
+<tr class="dim even">
+<td>XGBoost</td>
+<td>0.888</td>
+<td>Training AUC — overfit</td>
+</tr>
+<tr class="odd">
+<td>XGBoost (tuned)</td>
+<td>0.793</td>
+<td>Selected</td>
+</tr>
+</tbody>
+</table>
+
+  </div>
+
+  <section class="article-section">
+    <p>Tuned XGBoost won on test AUC and held its shape between train and test on the gains curves.
+    A defensible choice, and by every metric I had been taught to check, a finished model.</p>
+  </section>
+
+  <section class="article-section">
+    <h2>Then I looked at the level</h2>
+    <p>Applying that model to the 30,000-customer representative sample — the one built to mirror the
+    actual subscriber base — produced a mean predicted churn probability of <strong>40.6%</strong>.
+    The real market rate is about 2%.</p>
+  </section>
+
+  <div class="article-stats">
+    <div class="article-stat"><div class="article-stat-v">0.793</div><div class="article-stat-l">Test AUC — genuinely good ranking</div></div>
+    <div class="article-stat"><div class="article-stat-v">40.6%</div><div class="article-stat-l">Mean predicted churn</div></div>
+    <div class="article-stat"><div class="article-stat-v">~2%</div><div class="article-stat-l">Actual market churn</div></div>
+    <div class="article-stat"><div class="article-stat-v">17×</div><div class="article-stat-l">Overstatement of churners</div></div>
+  </div>
+
+  <section class="article-section">
+    <p>The cause was in the training data. The 39,000-row sample had been built at roughly
+    <strong>50% churn</strong> — deliberately oversampled so the models would have enough positive
+    cases to learn from. That is a sensible thing to do for estimation, and a catastrophic thing to
+    forget afterwards. The model learned the shape of churn risk on a world where half of everyone
+    leaves, then reported those probabilities into a world where one in fifty does.</p>
+    <p>The fix was to re-estimate on the full million-row dataset, which carries the true ~2% base
+    rate — same features, same hyperparameters, no retuning. About 682,000 training rows.</p>
+  </section>
+
+  <div class="article-panel">
+    <div class="article-panel-head">
+      <div>
+        <div class="article-panel-title">Mean predicted churn on the 30,000-customer representative sample</div>
+        <div class="article-panel-sub">Identical model specification. The only change is the base rate of the
+        data it was fitted on.</div>
+      </div>
+    </div>
+    <div class="article-chart-host">
+      <div class="article-chart-scroll"><svg id="chart1" class="article-chart-sm" viewbox="0 0 700 300" role="img" aria-label="Bar chart comparing mean predicted churn of 40.6 percent from the oversampled model versus 2.38 percent from the full-data model, against a 2 percent market rate"></svg></div>
+      <div class="article-tip" id="tip1"></div>
+    </div>
+    <div class="article-tbl-wrap">
+      
+<table class="article-table caption-top">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">Trained on</th>
+<th data-quarto-table-cell-role="th">Churn in training data</th>
+<th data-quarto-table-cell-role="th">Mean predicted churn</th>
+<th data-quarto-table-cell-role="th">Implied churners</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>39K sample</td>
+<td>~50%</td>
+<td>40.60%</td>
+<td>12,180</td>
+</tr>
+<tr class="even">
+<td>1M dataset</td>
+<td>~2%</td>
+<td>2.38%</td>
+<td>713</td>
+</tr>
+</tbody>
+</table>
+
+    </div>
+  </div>
+
+  <section class="article-section">
+    <p>Retrained, the same architecture returned a test AUC of <strong>0.794</strong> — statistically
+    indistinguishable from the 0.793 I started with. The ranking never changed. The number attached to
+    each customer changed by a factor of seventeen.</p>
+
+    <div class="article-callout">
+      <p>AUC only asks whether riskier customers score higher than safer ones. It is unchanged by any
+      transformation that preserves order — so a model can be <em>perfectly</em> ranked and
+      <em>arbitrarily</em> mis-scaled, and no ranking metric will ever tell you. Lifetime value
+      calculations use the level, not the order. Had I shipped the first model, every budget
+      downstream would have been inflated seventeenfold.</p>
+    </div>
+  </section>
+
+  <section class="article-section">
+    <h2>Testing five retention programs</h2>
+    <p>With probabilities on the right scale, I simulated five interventions by editing the input that
+    each program targets — set overage charges to zero, set retention calls to zero — and re-scoring
+    through the model.</p>
+  </section>
+
+  <div class="article-panel">
+    <div class="article-panel-head">
+      <div>
+        <div class="article-panel-title">Observed churn versus predicted churn after intervention</div>
+        <div class="article-panel-sub">Each pair is one program, on the customers who would receive it. Hover
+        any row for detail.</div>
+      </div>
+      <div class="article-seg" role="group" aria-label="Highlight">
+        <button id="b-all" aria-pressed="true">All five</button>
+        <button id="b-kept" aria-pressed="false">Funded only</button>
+      </div>
+    </div>
+    <div class="article-legend">
+      <div class="article-lg"><span class="article-sw article-sw-r" style="background:var(--s-a)"></span>Observed churn in group</div>
+      <div class="article-lg"><span class="article-sw article-sw-r" style="background:var(--s-b)"></span>Predicted after intervention</div>
+      <div class="article-lg"><span class="article-sw" style="background:var(--muted);height:2px;width:16px;border-radius:0"></span>Sample mean prediction, 2.38%</div>
+    </div>
+    <div class="article-chart-host">
+      <div class="article-chart-scroll"><svg id="chart2" viewbox="0 0 720 330" role="img" aria-label="Dumbbell chart of observed versus post-intervention predicted churn for five retention programs"></svg></div>
+      <div class="article-tip" id="tip2"></div>
+    </div>
+    <div class="article-tbl-wrap">
+      
+<table class="article-table caption-top">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">Program</th>
+<th data-quarto-table-cell-role="th">Targeted</th>
+<th data-quarto-table-cell-role="th">Observed churn</th>
+<th data-quarto-table-cell-role="th">Predicted after</th>
+<th data-quarto-table-cell-role="th">Funded</th>
+</tr>
+</thead>
+<tbody id="tbody2">
+</tbody>
+</table>
+
+    </div>
+  </div>
+
+  <section class="article-section">
+    <p>Read at face value, two programs made things worse — customer care and early-tenure engagement
+    both showed higher churn after the simulated fix. The notebook I wrote at the time put this down
+    to "how XGBoost combines things" and dropped them.</p>
+
+    <div class="article-flagbox">
+      <p><strong>That conclusion doesn't hold, and the error is mine.</strong> The two numbers in each
+      pair aren't comparable. <em>Observed churn</em> is what actually happened to those customers.
+      <em>Predicted after</em> is what the model says post-intervention. To isolate an intervention
+      effect you have to compare the model's prediction <em>before</em> against its prediction
+      <em>after</em> — same model, same customers, one variable changed. I never computed the
+      before.</p>
+      <p>New Handset Support proves the point. Its 26 customers contain zero actual churners, so
+      observed churn is 0.0% — and against zero, any positive prediction looks like the program
+      causes churn. That isn't an intervention effect. It's a 26-person sample with no events in it.</p>
+    </div>
+
+    <p>So the honest statement is not "two programs backfired." It is that <strong>the sign of the
+    effect is unknown for four of the five</strong>, because the baseline was never measured. Only
+    Usage-Based Plan is safe, and only because its gap is wide enough to survive the confusion.</p>
+    <p>There's a second inconsistency I found on re-reading: First Call Resolution shows the largest
+    apparent improvement of any service program — 3.32% down to 2.38% — and it was dropped from the
+    economics anyway, while New Handset Support, which looks worse on the same flawed comparison, was
+    kept. Neither decision follows from the numbers.</p>
+  </section>
+
+  <section class="article-section">
+    <h2>The economics that survived</h2>
+    <p>For the programs that went forward, I valued each over a 60-month window, discounting at 10% a
+    year. Breakeven is the most you could spend per customer before the retained revenue stops
+    covering it; I proposed half that, as a margin against the effect being smaller than modeled.</p>
+  </section>
+
+  <div class="article-tbl-wrap">
+    
+<table class="article-table caption-top">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">Program</th>
+<th data-quarto-table-cell-role="th">Targeted</th>
+<th data-quarto-table-cell-role="th">Breakeven / customer</th>
+<th data-quarto-table-cell-role="th">Proposed / customer</th>
+<th data-quarto-table-cell-role="th">Total budget</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Usage-Based Plan</td>
+<td>16,264</td>
+<td>S$407.80</td>
+<td>S$203.90</td>
+<td>S$3,316,229</td>
+</tr>
+<tr class="even">
+<td>Student Bundle</td>
+<td>1,654</td>
+<td>S$452.36</td>
+<td>S$226.18</td>
+<td>S$374,101</td>
+</tr>
+<tr class="dim odd">
+<td>New Handset Support</td>
+<td>26</td>
+<td>S$0</td>
+<td>S$0</td>
+<td>S$0</td>
+</tr>
+</tbody><tfoot>
+<tr class="odd">
+<td>Proposed total</td>
+<td>17,944</td>
+<td></td>
+<td></td>
+<td>S$3,690,330</td>
+</tr>
+</tfoot>
+
+</table>
+
+  </div>
+  <p class="article-fine">Figures in Singapore dollars. "Total budget" is proposed spend per customer × customers
+  targeted — an investment ceiling, not a profit forecast.</p>
+
+  <section class="article-section">
+    <p>One caveat belongs in the open rather than a footnote: the Student Bundle's S$452 breakeven does
+    not come from the model at all. Occupation is categorical, so I couldn't simulate it the way I
+    simulated overage. The 1.5% churn reduction behind that number is an <strong>assumption I
+    chose</strong>. It happens to produce the highest breakeven in the table, which is exactly the
+    situation where an assumption deserves to be labelled loudly.</p>
+  </section>
+
+  <section class="article-section">
+    <h2>The technical layer</h2>
+    <div class="article-tech-label">For readers who want the mechanics</div>
+
+    <details class="article-details">
+    <summary>Why oversampling breaks probabilities but not rankings</summary>
+    <div class="article-det-body">
+    <p>With ~2% churn, a 39,000-row sample holds only about 800 churners. Oversampling to 50/50 gives
+    the model far more signal per unit of compute, which is why it's standard practice for rare events.</p>
+    <p>What it changes is the intercept. The model learns P(churn | features) under a prior of 0.5 and
+    reports that, even though the deployment prior is 0.02. Because the distortion is monotone, every
+    rank-based diagnostic — AUC, gains, lift — is untouched. Every level-based use — expected churners,
+    lifetime value, budgets — is wrong by roughly the ratio of the two priors.</p>
+    <p>Two fixes exist. Re-estimate on data carrying the true base rate, which is what I did. Or keep
+    the oversampled fit and correct the intercept analytically. Worth noting: the weighted logistic
+    regression came out correctly scaled at 2.29% on the same sample, because the weights restored the
+    prior. The tree ensemble had no such correction, and I didn't add one.</p>
+    </div>
+    </details>
+
+    <details class="article-details">
+    <summary>What "simulating an intervention" actually assumes</summary>
+    <div class="article-det-body">
+    <p>Setting <code>overage = 0</code> and re-scoring is a convenient move that smuggles in two strong
+    assumptions.</p>
+    <p><strong>First, that the program works perfectly.</strong> Moving someone to a better-fitting plan
+    is modeled as overage vanishing entirely, not shrinking. Real programs have partial take-up and
+    partial effect.</p>
+    <p><strong>Second, and more seriously, that the association is causal.</strong> XGBoost learned that
+    customers with overage churn more. It cannot distinguish "overage charges cause people to leave"
+    from "the kind of customer who overruns their plan is also the kind who leaves." Zeroing the
+    variable answers a question about the <em>model</em>, not about the world.</p>
+    <p>This is why the case asks for a randomized trial design alongside the simulation, and why my
+    proposal was to split the target group 50/50 and measure churn at 30 days and at 3–6 months. The
+    model estimate is a prior for sizing the pilot — not a substitute for it.</p>
+    </div>
+    </details>
+
+    <details class="article-details">
+    <summary>How lifetime value was computed</summary>
+    <div class="article-det-body">
+    <p>For each targeted customer I projected monthly margin over 60 months, with survival to each month
+    driven by the predicted churn probability, discounted at 10% annually. Running it twice — once at
+    baseline churn, once at post-intervention churn — gives two lifetime values, and the difference is
+    the value the program creates.</p>
+    <p>Breakeven per customer is that difference. Spend exactly it and you are indifferent; spend less
+    and you profit. The proposed figure is 50% of breakeven, which is a judgment call rather than a
+    derived quantity, chosen because the effect estimates carry the uncertainty described above.</p>
+    </div>
+    </details>
+
+    <details class="article-details">
+    <summary>What I'd do differently</summary>
+    <div class="article-det-body">
+    <p><strong>Compute the baseline prediction per group.</strong> This is the one real defect in the
+    analysis. One extra line — the mean of the baseline prediction restricted to each target group —
+    turns five ambiguous comparisons into five valid ones, and would likely change which programs got
+    funded.</p>
+    <p><strong>Check calibration deliberately, not accidentally.</strong> I caught the 17× error because
+    the mean prediction looked implausible. That is luck, not method. A calibration plot alongside every
+    AUC would have surfaced it immediately, and I now treat "what is the mean predicted probability, and
+    does it match the base rate?" as a required check before any model touches money.</p>
+    <p><strong>Drop the 26-customer program.</strong> New Handset Support cannot support any conclusion
+    at that sample size. Reporting it as a S$0 breakeven implies a finding of "no value," when the honest
+    statement is "no evidence either way."</p>
+    <p><strong>Put a range on the lifetime values.</strong> A 60-month projection compounds the churn
+    estimate sixty times. Small errors in the probability become large errors in the total, and a single
+    point estimate hides that entirely.</p>
+    </div>
+    </details>
+  </section>
+
+  <section class="article-section">
+    <h2>What this case taught me</h2>
+    <p>Two lessons, and the second one only arrived on a second reading.</p>
+    <p><strong>A model has two separate jobs, and passing one says nothing about the other.</strong>
+    Ranking answers "who is riskiest?" Calibration answers "how likely is this, really?" AUC only audits
+    the first. Any decision that multiplies a probability by money depends entirely on the second.</p>
+    <p><strong>A comparison is a claim, and it needs the same scrutiny as a model.</strong> I built a
+    careful model, corrected a serious scaling error, and then evaluated five programs against a baseline
+    that couldn't support the conclusion I drew from it. The modeling was the easy part. Deciding what
+    two numbers mean when you put them side by side is where the actual reasoning lives.</p>
+    <div class="chips article-chips">
+      <span class="chip">Churn modeling</span>
+      <span class="chip">Probability calibration</span>
+      <span class="chip">Class imbalance / oversampling</span>
+      <span class="chip">XGBoost tuning</span>
+      <span class="chip">CLV modeling</span>
+      <span class="chip">Intervention simulation</span>
+      <span class="chip">Experiment design</span>
+      <span class="chip">polars</span>
+    </div>
+    <p class="article-fine">Figures are from my own analysis on the course dataset. The underlying case materials
+    and data are proprietary to the publisher and are not reproduced here.</p>
+  </section>
+</div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>Based in San Diego, CA · UCSD MS Business Analytics</span>
+    <div class="footer-links">
+      <a href="https://linkedin.com/in/eesha-jagdhane" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://github.com/eeshajagdhane?tab=repositories" target="_blank" rel="noopener">GitHub</a>
+      <a href="mailto:ejagdhane99@gmail.com">Email</a>
+      <a href="../resume.pdf" target="_blank" rel="noopener">Resume</a>
+    </div>
+    <span>© 2026 Eesha Jagdhane</span>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  (function(){
+    function el(n,a){var e=document.createElementNS("http://www.w3.org/2000/svg",n);
+      for(var k in a)e.setAttribute(k,a[k]);return e;}
+    function place(tip,host,node){
+      var hb=host.getBoundingClientRect(),bb=node.getBoundingClientRect();
+      var lx=bb.left-hb.left+bb.width/2-tip.offsetWidth/2;
+      tip.style.left=Math.max(4,Math.min(lx,hb.width-tip.offsetWidth-4))+"px";
+      tip.style.top=(bb.top-hb.top-tip.offsetHeight-9)+"px";
+    }
+
+    (function(){
+      var svg=document.getElementById("chart1"),tip=document.getElementById("tip1"),
+          host=svg.parentNode.parentNode;
+      var W=700,H=300,ML=76,MR=20,MT=32,MB=64,ph=H-MT-MB,pw=W-ML-MR,YMAX=45;
+      var rows=[
+        {k:"Trained on 39K sample",v:40.60,n:"12,180",c:"var(--s-b)",
+         d:"Oversampled to ~50% churn. Ranking is fine; the level is not."},
+        {k:"Trained on 1M dataset",v:2.38,n:"713",c:"var(--s-a)",
+         d:"Same features, same hyperparameters, true ~2% base rate."}
+      ];
+      var y=function(v){return MT+ph-(v/YMAX)*ph;};
+      for(var t=0;t<=40;t+=10){
+        svg.appendChild(el("line",{x1:ML,x2:W-MR,y1:y(t),y2:y(t),stroke:"var(--grid)","stroke-width":1}));
+        var yl=el("text",{x:ML-11,y:y(t)+4,"text-anchor":"end","class":"article-ax"});
+        yl.textContent=t+"%";svg.appendChild(yl);
+      }
+      svg.appendChild(el("line",{x1:ML,x2:W-MR,y1:y(2),y2:y(2),stroke:"var(--ink)",
+        "stroke-width":1.5,"stroke-dasharray":"5 4"}));
+      var rl=el("text",{x:W-MR,y:y(2)-8,"text-anchor":"end","class":"article-ax",fill:"var(--ink)"});
+      rl.textContent="Actual market churn ≈ 2%";svg.appendChild(rl);
+
+      var gw=pw/rows.length;
+      rows.forEach(function(r,i){
+        var bw=Math.min(120,gw*0.42),cx=ML+gw*i+gw/2,bx=cx-bw/2;
+        var bh=Math.max(2,MT+ph-y(r.v));
+        var bar=el("rect",{x:bx,y:y(r.v),width:bw,height:bh,rx:4,fill:r.c,"class":"article-hit bar"});
+        bar.addEventListener("mouseenter",function(){
+          tip.innerHTML="<b>"+r.k+"</b><br><span class='article-tip-num'>"+r.v.toFixed(2)+
+            "% mean predicted churn</span><br><span class='article-tip-num'>"+r.n+
+            "</span> implied churners of 30,000<br>"+r.d;
+          tip.style.opacity=1;place(tip,host,bar);
+        });
+        bar.addEventListener("mouseleave",function(){tip.style.opacity=0;});
+        svg.appendChild(bar);
+        var vl=el("text",{x:cx,y:y(r.v)-9,"text-anchor":"middle","class":"article-vlab"});
+        vl.textContent=r.v.toFixed(2)+"%";svg.appendChild(vl);
+        var ml=el("text",{x:cx,y:MT+ph+21,"text-anchor":"middle","class":"article-mlab"});
+        ml.textContent=r.k;svg.appendChild(ml);
+        var nl=el("text",{x:cx,y:MT+ph+38,"text-anchor":"middle","class":"article-nlab"});
+        nl.textContent=r.n+" implied churners";svg.appendChild(nl);
+      });
+      svg.appendChild(el("line",{x1:ML,x2:W-MR,y1:MT+ph,y2:MT+ph,stroke:"var(--line-2)","stroke-width":1}));
+      var yt=el("text",{x:ML,y:MT-12,"text-anchor":"start","class":"article-ax"});
+      yt.textContent="Mean predicted churn";svg.appendChild(yt);
+    })();
+
+    (function(){
+      var svg=document.getElementById("chart2"),tip=document.getElementById("tip2"),
+          host=svg.parentNode.parentNode,tb=document.getElementById("tbody2");
+      var D=[
+        {k:"Usage-Based Plan",      n:16264, o:2.4348, p:1.4655, fund:true,
+         note:"Widest gap of the five, and the only one robust to the baseline problem."},
+        {k:"First Call Resolution", n:754,   o:3.3156, p:2.3790, fund:false,
+         note:"Largest apparent improvement among service programs — dropped anyway."},
+        {k:"Customer Care",         n:11836, o:1.5884, p:2.1357, fund:false,
+         note:"Reads as worse, but observed churn is not the model's baseline."},
+        {k:"Early Tenure",          n:486,   o:1.6461, p:2.3324, fund:false,
+         note:"Same invalid comparison; sign of the true effect is unknown."},
+        {k:"New Handset Support",   n:26,    o:0.0,    p:2.0329, fund:true,
+         note:"26 customers, zero observed churners. Nothing can be concluded."}
+      ];
+      var W=720,H=330,ML=150,MR=64,MT=30,MB=44,pw=W-ML-MR,ph=H-MT-MB,XMAX=4;
+      var x=function(v){return ML+(v/XMAX)*pw;};
+      var rowH=ph/D.length;
+      for(var t=0;t<=4;t+=1){
+        svg.appendChild(el("line",{x1:x(t),x2:x(t),y1:MT-6,y2:MT+ph,stroke:"var(--grid)","stroke-width":1}));
+        var xl=el("text",{x:x(t),y:MT+ph+20,"text-anchor":"middle","class":"article-ax"});
+        xl.textContent=t+"%";svg.appendChild(xl);
+      }
+      svg.appendChild(el("line",{x1:x(2.38),x2:x(2.38),y1:MT-6,y2:MT+ph,stroke:"var(--muted)",
+        "stroke-width":1.5,"stroke-dasharray":"5 4"}));
+
+      var groups=[];
+      D.forEach(function(r,i){
+        var cy=MT+rowH*i+rowH/2;
+        var g=el("g",{"class":"row-g"});
+        g.appendChild(el("line",{x1:x(Math.min(r.o,r.p)),x2:x(Math.max(r.o,r.p)),y1:cy,y2:cy,
+          stroke:"var(--line-2)","stroke-width":2}));
+        g.appendChild(el("circle",{cx:x(r.o),cy:cy,r:6,fill:"var(--s-a)",
+          stroke:"var(--card)","stroke-width":2}));
+        g.appendChild(el("circle",{cx:x(r.p),cy:cy,r:6,fill:"var(--s-b)",
+          stroke:"var(--card)","stroke-width":2}));
+        var lb=el("text",{x:ML-14,y:cy+4,"text-anchor":"end","class":"article-mlab"});
+        lb.textContent=r.k;g.appendChild(lb);
+        var nb=el("text",{x:W-MR+8,y:cy+4,"class":"article-nlab"});
+        nb.textContent="n="+r.n.toLocaleString("en-US");g.appendChild(nb);
+        var hit=el("rect",{x:ML-146,y:cy-rowH/2,width:W-ML+140,height:rowH,fill:"transparent","class":"article-hit"});
+        hit.addEventListener("mouseenter",function(){
+          g.classList.add("on");
+          tip.innerHTML="<b>"+r.k+"</b><br><span class='article-tip-num'>"+r.n.toLocaleString("en-US")+
+            "</span> customers<br>observed <span class='article-tip-num'>"+r.o.toFixed(2)+
+            "%</span> → predicted <span class='article-tip-num'>"+r.p.toFixed(2)+"%</span><br>"+r.note;
+          tip.style.opacity=1;place(tip,host,hit);
+        });
+        hit.addEventListener("mouseleave",function(){g.classList.remove("on");tip.style.opacity=0;});
+        g.appendChild(hit);
+        svg.appendChild(g);
+        groups.push({g:g,r:r});
+      });
+      var xt=el("text",{x:ML,y:MT-14,"class":"article-ax"});
+      xt.textContent="Churn rate";svg.appendChild(xt);
+
+      tb.innerHTML=D.map(function(r){
+        return "<tr"+(r.fund?"":" class='dim'")+"><td>"+r.k+"</td><td>"+r.n.toLocaleString("en-US")+
+          "</td><td>"+r.o.toFixed(2)+"%</td><td>"+r.p.toFixed(2)+"%</td><td>"+
+          (r.fund?"Yes":"No")+"</td></tr>";
+      }).join("");
+
+      function setMode(kept){
+        document.getElementById("b-all").setAttribute("aria-pressed",!kept);
+        document.getElementById("b-kept").setAttribute("aria-pressed",kept);
+        groups.forEach(function(o){
+          o.g.style.opacity = (!kept || o.r.fund) ? "" : ".28";
+        });
+      }
+      document.getElementById("b-all").addEventListener("click",function(){setMode(false);});
+      document.getElementById("b-kept").addEventListener("click",function(){setMode(true);});
+    })();
+  })();
+</script>
+
+
+
+
+
+
+</body></html>
