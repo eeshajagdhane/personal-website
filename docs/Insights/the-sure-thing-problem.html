@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>The sure thing problem – Eesha Jagdhane</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+</style>
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body>
+
+
+
+
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="brand">EJ.</a>
+    <ul class="nav-links">
+      <li><a href="../about.html">About</a></li>
+      <li><a href="../experience.html">Experience</a></li>
+      <li><a href="../projects.html">Projects</a></li>
+      <li><a href="../hobbies.html">Hobbies</a></li>
+      <li><a href="../insights.html" class="active">Insights</a></li>
+    </ul>
+    <a href="../contact.html" class="btn-dark">Get in touch</a>
+  </div>
+</nav>
+
+<main><header id="title-block-header" class="quarto-title-block"></header>
+<div class="page page-article reveal">
+  <a href="../insights.html" class="arrow-link article-back">← Insights</a>
+
+  <div class="eyebrow page-eyebrow">Customer Analytics · Case Study</div>
+  <h1 class="page-title">The sure thing problem</h1>
+  <p class="article-deck">
+    A mobile game had proof its ads worked — conversion more than doubled in a clean
+    experiment. The harder question was <em>who</em> to keep showing them to. Ranking players by who
+    was most likely to buy turned out to be the expensive answer.
+  </p>
+
+  <dl class="article-meta">
+    <div><dt>Role</dt><dd>Analyst</dd></div>
+    <div><dt>Case</dt><dd>Mobile game ad targeting</dd></div>
+    <div><dt>Stack</dt><dd>Python · polars · pyrsm · scikit-learn</dd></div>
+    <div><dt>Course</dt><dd>MGTA 455, Rady School of Management</dd></div>
+  </dl>
+
+  <section class="article-section">
+    <h2>The setup</h2>
+    <p>A studio behind a successful mobile action game launched its first paid expansion at
+    <strong>$14.99</strong>. Two months in, only <strong>5.75%</strong> of active players had bought it.
+    Leadership saw two possible explanations: the price was too high, or players simply didn't know the
+    expansion existed.</p>
+    <p>Cutting price is close to irreversible, so the awareness theory got tested first — with in-app
+    ads. Showing a player ads for two weeks costs about <strong>$1.50</strong> in forgone in-game
+    currency purchases. That gives the whole problem a clean economic spine: an ad is worth showing
+    only when it moves someone across the line by more than $1.50 ÷ $14.99, or about
+    <strong>10 percentage points</strong> of purchase probability.</p>
+  </section>
+
+  <section class="article-section">
+    <h2>The experiment worked. That was the easy part.</h2>
+    <p>Two randomly assigned groups of 30,000 players each — one saw ads, one didn't:</p>
+  </section>
+
+  <div class="article-stats">
+    <div class="article-stat"><div class="article-stat-v">5.69%</div><div class="article-stat-l">Conversion without ads</div></div>
+    <div class="article-stat"><div class="article-stat-v">13.04%</div><div class="article-stat-l">Conversion with ads</div></div>
+    <div class="article-stat"><div class="article-stat-v">+7.36pp</div><div class="article-stat-l">Absolute lift</div></div>
+    <div class="article-stat"><div class="article-stat-v">+129%</div><div class="article-stat-l">Relative lift</div></div>
+  </div>
+
+  <section class="article-section">
+    <p>Before trusting any of that, I checked the randomization held. Average player level came in at
+    6.22 versus 6.32 between groups; friend counts at 49.8 versus 51.0; spaceship ownership 71.5%
+    versus 70.3%. Every feature landed inside a few percent. The groups were comparable, so the gap in
+    conversion is the ads and not the players.</p>
+
+    <div class="article-callout">
+      <p>Ads work <em>on average</em>. But you don't run a campaign on an average — you run it on a
+      list. Averages hide the fact that a single number is hiding four completely different kinds of
+      player.</p>
+    </div>
+  </section>
+
+  <section class="article-section">
+    <h2>Four kinds of player</h2>
+    <p>Every player falls into one of four boxes, depending on what they'd do with the ad and what
+    they'd do without it. Only one box is worth paying for.</p>
+  </section>
+
+  <div class="article-panel">
+    <div class="article-panel-head">
+      <div>
+        <div class="article-panel-title">Who is actually worth $1.50?</div>
+        <div class="article-panel-sub">Select a group to see what targeting it does to the campaign. Conceptual
+        framing — not measured segment sizes.</div>
+      </div>
+    </div>
+    <div class="article-qaxis">↓ Buys when shown an ad &nbsp;·&nbsp; → Buys when shown nothing</div>
+    <div class="article-quad" id="quad">
+      <button class="article-qcell" data-q="0" aria-pressed="true">
+        <div class="article-qn">Sure Things</div><div class="article-qd">Buys either way</div></button>
+      <button class="article-qcell" data-q="1" aria-pressed="false">
+        <div class="article-qn">Persuadables</div><div class="article-qd">Buys only if shown the ad</div></button>
+      <button class="article-qcell" data-q="2" aria-pressed="false">
+        <div class="article-qn">Sleeping Dogs</div><div class="article-qd">Buys only if left alone</div></button>
+      <button class="article-qcell" data-q="3" aria-pressed="false">
+        <div class="article-qn">Lost Causes</div><div class="article-qd">Never buys</div></button>
+    </div>
+    <div class="article-qout" id="qout"></div>
+  </div>
+
+  <section class="article-section">
+    <p>A propensity model ranks players by <em>P(buy | ad)</em>. That score is high for Persuadables —
+    but it's just as high for Sure Things, who were going to buy anyway. Spend $1.50 on a Sure Thing and
+    you bought a conversion you already had.</p>
+    <p>An uplift model ranks by the difference instead: <em>P(buy | ad) − P(buy | no ad)</em>. Sure Things
+    score near zero, because the ad changes nothing for them. Only Persuadables rise to the top.</p>
+  </section>
+
+  <section class="article-section">
+    <h2>What the models actually returned</h2>
+    <p>I built both approaches — propensity and uplift — across four algorithms, then measured
+    incremental profit on an 18,000-player holdout, scaled to the full 120,000-player base.</p>
+    <p>The toggle below is the finding. It switches between sending ads to a fixed top 25% of players,
+    and letting each model choose its own depth using the $1.50 ÷ $14.99 threshold.</p>
+  </section>
+
+  <div class="article-panel">
+    <div class="article-panel-head">
+      <div>
+        <div class="article-panel-title">Incremental profit by model and targeting strategy</div>
+        <div class="article-panel-sub" id="csub"></div>
+      </div>
+      <div class="article-seg" role="group" aria-label="Targeting depth">
+        <button id="btn-opt" aria-pressed="true">Optimal depth</button>
+        <button id="btn-fix" aria-pressed="false">Fixed 25%</button>
+      </div>
+    </div>
+    <div class="article-legend">
+      <div class="article-lg"><span class="article-sw" style="background:var(--s-prop)"></span>Propensity targeting</div>
+      <div class="article-lg"><span class="article-sw" style="background:var(--s-up)"></span>Uplift targeting</div>
+    </div>
+    <div class="article-chart-host">
+      <div class="article-chart-scroll"><svg id="chart" viewbox="0 0 760 400" role="img" aria-label="Grouped bar chart of incremental profit by model, comparing propensity and uplift targeting"></svg></div>
+      <div class="article-tip" id="tip"></div>
+    </div>
+    <div class="article-tbl-wrap">
+      
+<table class="article-table caption-top">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">Model</th>
+<th data-quarto-table-cell-role="th">Propensity</th>
+<th data-quarto-table-cell-role="th">Uplift</th>
+<th data-quarto-table-cell-role="th">Difference</th>
+</tr>
+</thead>
+<tbody id="tbody">
+</tbody>
+</table>
+
+    </div>
+    <p class="article-fine" id="precnote" hidden="">≈ Values recorded to five significant figures in the original
+    output; the logistic pair and all differences are exact.</p>
+  </div>
+
+  <section class="article-section">
+    <p>At a <strong>fixed 25%</strong>, the story looks inconsistent. The three flexible models show
+    uplift winning by $735K–$783K. Logistic regression does the opposite — its uplift version returns
+    $657,986 against $1,546,217 for propensity, an $888,231 loss. Read that column alone and uplift modeling looks
+    unreliable.</p>
+    <p>Let each model pick its own depth and the contradiction disappears. <strong>Uplift wins for all
+    four</strong>, logistic included, by $386K to $499K. The best combination — gradient boosting on
+    uplift scores, 30% of players — returns <strong>$2,893,786</strong>.</p>
+
+    <div class="article-callout">
+      <p>The logistic anomaly was never really about logistic regression. It was about forcing every
+      model to target the same 25%. Depth was a free parameter I'd accidentally frozen, and freezing it
+      produced a finding that wasn't there.</p>
+    </div>
+
+    <p>There's a second pattern worth noticing. Propensity models want a wider audience — their optima
+    land at 30% to 40% — while uplift models converge tightly on 25% to 30%. Uplift makes more money
+    while mailing fewer people, which is what you'd expect once Sure Things stop occupying slots at the
+    top of the list.</p>
+  </section>
+
+  <section class="article-section">
+    <h2>The technical layer</h2>
+    <div class="article-tech-label">For readers who want the mechanics</div>
+
+    <details class="article-details">
+    <summary>How the uplift score is built</summary>
+    <div class="article-det-body">
+    <p>I used the two-model approach. One model is fit on the treated group and one on the control
+    group, using the same feature set — telemetry like level reached, days active, friend count, prior
+    purchases, badges earned, and device type. Each player in the holdout gets scored by both.</p>
+    <p>The uplift score is the difference between those two predictions. Propensity is just the first
+    prediction on its own. Both rankings come from the same fitted models, so the comparison isolates
+    the <em>ranking rule</em> rather than confounding it with model quality.</p>
+    <p>The known weakness: subtracting two estimates adds their errors. When both models are noisy, the
+    difference is noisier than either — which is exactly why the linear model struggled at fixed depth
+    while the flexible models didn't.</p>
+    </div>
+    </details>
+
+    <details class="article-details">
+    <summary>Where the 10.01% threshold comes from</summary>
+    <div class="article-det-body">
+    <p>Showing ads costs $1.50; a conversion is worth $14.99. Targeting a player pays off when expected
+    incremental revenue clears the cost:</p>
+    <p><strong>uplift × $14.99 &gt; $1.50</strong>, so <strong>uplift &gt; 0.1001</strong></p>
+    <p>Count how many holdout players clear that bar and you get the optimal depth directly from the
+    data rather than from a round number. Those counts came to 24.23% for logistic uplift, 31.26% for
+    the neural network, 31.46% for random forest, and 31.14% for gradient boosting — each rounded to the
+    nearest 5% for a deployable rule.</p>
+    <p>The same threshold applies to propensity scores, but it means something different there: it asks
+    whether someone is likely to buy at all, not whether the ad is what moved them. Same arithmetic,
+    different question — and that difference is the entire post.</p>
+    </div>
+    </details>
+
+    <details class="article-details">
+    <summary>Validating the implementation across two libraries</summary>
+    <div class="article-det-body">
+    <p>I built every model twice — once through the course's <code>pyrsm</code> wrapper, once directly
+    in scikit-learn — then correlated the predictions to check the pipeline.</p>
+    <p>Random forest agreed almost perfectly (0.999 on treatment predictions, 0.995 on uplift), and
+    gradient boosting nearly as closely (0.975 / 0.979). The neural network came in far lower, at 0.595
+    and 0.541.</p>
+    <p>That gap isn't a bug — neural networks are sensitive to initialization, solver, and learning-rate
+    schedule, and the two libraries don't share defaults. But it is a caution: the neural network's
+    numbers are the least reproducible in the set, and I'd want a fixed seed and a matched optimizer
+    before putting weight on them.</p>
+    </div>
+    </details>
+
+    <details class="article-details">
+    <summary>What I'd do differently</summary>
+    <div class="article-det-body">
+    <p><strong>Report a range, not a point.</strong> Every profit figure is a single draw on one 18,000-row
+    holdout. Two of the four differences fall within a few hundred thousand dollars of each other on a
+    $2.8M base. Bootstrapped intervals would show which gaps survive resampling — my guess is the
+    uplift-versus-propensity gap does, and the ranking among the three flexible models does not.</p>
+    <p><strong>Check the Sleeping Dogs empirically.</strong> The framing above assumes they exist, but I
+    never tested the bottom of the uplift distribution for genuinely negative treatment effects. If ads
+    actively suppress purchases for some players, that's a finding worth having on its own.</p>
+    <p><strong>Model the depth decision directly.</strong> Rounding 31.14% to 30% is defensible, but the
+    profit curve near the optimum is flat enough that the rounding could matter more than the model
+    choice. I'd plot profit across every decile before committing.</p>
+    </div>
+    </details>
+  </section>
+
+  <section class="article-section">
+    <h2>What this case taught me</h2>
+    <p>The transferable lesson isn't "use uplift models." It's that <strong>the metric you rank on
+    encodes a causal claim</strong>, whether or not you meant to make one. Ranking by <em>who will
+    convert</em> quietly assumes the treatment caused the conversion. Ranking by <em>who will convert
+    because of the ad</em> makes that assumption explicit and testable.</p>
+    <p>The second lesson is cheaper to state and easier to forget: a comparison is only as honest as the
+    parameters you held fixed. I nearly drew a conclusion about logistic regression that was
+    really a conclusion about my own choice of 25%.</p>
+    <div class="chips article-chips">
+      <span class="chip">Uplift / CATE modeling</span>
+      <span class="chip">Randomized experiment validation</span>
+      <span class="chip">Profit-based decision thresholds</span>
+      <span class="chip">Gradient boosting</span>
+      <span class="chip">Neural networks</span>
+      <span class="chip">Random forests</span>
+      <span class="chip">Holdout evaluation</span>
+      <span class="chip">polars</span>
+      <span class="chip">scikit-learn</span>
+    </div>
+    <p class="article-fine">Figures are from my own analysis on the course dataset. The underlying case materials
+    and data are proprietary to the publisher and are not reproduced here.</p>
+  </section>
+</div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>Based in San Diego, CA · UCSD MS Business Analytics</span>
+    <div class="footer-links">
+      <a href="https://linkedin.com/in/eesha-jagdhane" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://github.com/eeshajagdhane?tab=repositories" target="_blank" rel="noopener">GitHub</a>
+      <a href="mailto:ejagdhane99@gmail.com">Email</a>
+      <a href="../resume.pdf" target="_blank" rel="noopener">Resume</a>
+    </div>
+    <span>© 2026 Eesha Jagdhane</span>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  (function(){
+    var DATA={
+      opt:{
+        sub:"Each model targets the depth its own threshold implies. Holdout results scaled to 120,000 players.",
+        rows:[
+          {m:"Logistic",       p:1824659, u:2298288, pp:30, up:25, d:473629, exact:true},
+          {m:"Neural Net",     p:2367532, u:2821018, pp:35, up:30, d:453486, exact:true},
+          {m:"Random Forest",  p:2459369, u:2845375, pp:40, up:30, d:386006, exact:true},
+          {m:"Gradient Boost", p:2395171, u:2893786, pp:35, up:30, d:498614, exact:true}
+        ]},
+      fix:{
+        sub:"Every model forced to the same top 25% of players — the comparison that produced a misleading result.",
+        approx:true,
+        rows:[
+          {m:"Logistic",       p:1546217, u:657986,  pp:25, up:25, d:-888231, exact:true},
+          {m:"Neural Net",     p:1953900, u:2736700, pp:25, up:25, d:782771},
+          {m:"Random Forest",  p:2016000, u:2750500, pp:25, up:25, d:734531},
+          {m:"Gradient Boost", p:2007200, u:2747500, pp:25, up:25, d:740307}
+        ]}
+    };
+    var mode="opt";
+    var svg=document.getElementById("chart"), tip=document.getElementById("tip"),
+        tbody=document.getElementById("tbody"), csub=document.getElementById("csub"),
+        host=svg.parentNode.parentNode;
+    var W=760,H=400,ML=72,MR=16,MT=32,MB=74,YMAX=3.1e6;
+    function money(v,ex){return (ex?"":"\u2248")+"$"+Math.round(v).toLocaleString("en-US");}
+    function mshort(v){return "$"+(v/1e6).toFixed(2)+"M";}
+    function el(n,a){var e=document.createElementNS("http://www.w3.org/2000/svg",n);
+      for(var k in a)e.setAttribute(k,a[k]);return e;}
+
+    function draw(){
+      var d=DATA[mode],rows=d.rows;
+      csub.textContent=d.sub;
+      while(svg.firstChild)svg.removeChild(svg.firstChild);
+      var pw=W-ML-MR, ph=H-MT-MB, y=function(v){return MT+ph-(v/YMAX)*ph;};
+
+      for(var t=0;t<=3e6;t+=5e5){
+        svg.appendChild(el("line",{x1:ML,x2:W-MR,y1:y(t),y2:y(t),stroke:"var(--grid)","stroke-width":1}));
+        var yl=el("text",{x:ML-11,y:y(t)+4,"text-anchor":"end","class":"article-ax"});
+        yl.textContent=t===0?"$0":"$"+(t/1e6).toFixed(1)+"M";
+        svg.appendChild(yl);
+      }
+      var gw=pw/rows.length;
+      rows.forEach(function(r,i){
+        var cx=ML+gw*i+gw/2, bw=Math.min(52,gw*0.29), gap=2;
+        [["p",r.p,"var(--s-prop)","Propensity",r.pp],["u",r.u,"var(--s-up)","Uplift",r.up]]
+        .forEach(function(s,j){
+          var v=s[1], bx=cx+(j===0?-bw-gap/2:gap/2), bh=Math.max(2,MT+ph-y(v));
+          var bar=el("rect",{x:bx,y:y(v),width:bw,height:bh,rx:4,fill:s[2],"class":"bar"});
+          bar.addEventListener("mouseenter",function(){
+            bar.classList.add("on");
+            tip.innerHTML="<b>"+r.m+" · "+s[3]+"</b><br><span class='article-tip-num'>"+money(v)+
+              "</span><br>targets top "+s[4]+"% of players";
+            tip.style.opacity=1;
+            var hb=host.getBoundingClientRect(),bb=bar.getBoundingClientRect();
+            var lx=bb.left-hb.left+bb.width/2-tip.offsetWidth/2;
+            tip.style.left=Math.max(4,Math.min(lx,hb.width-tip.offsetWidth-4))+"px";
+            tip.style.top=(bb.top-hb.top-tip.offsetHeight-9)+"px";
+          });
+          bar.addEventListener("mouseleave",function(){bar.classList.remove("on");tip.style.opacity=0;});
+          svg.appendChild(bar);
+          var vl=el("text",{x:bx+bw/2,y:y(v)-7,"text-anchor":"middle","class":"article-vlab"});
+          vl.textContent=mshort(v); svg.appendChild(vl);
+        });
+        var ml=el("text",{x:cx,y:MT+ph+21,"text-anchor":"middle","class":"article-mlab"});
+        ml.textContent=r.m; svg.appendChild(ml);
+        var diff=r.d, sign=diff>=0?"+":"−";
+        var dl=el("text",{x:cx,y:MT+ph+40,"text-anchor":"middle","class":"article-dlab",
+          fill:diff>=0?"var(--s-up)":"var(--s-prop)"});
+        dl.textContent=sign+"$"+Math.abs(Math.round(diff)).toLocaleString("en-US")+" uplift";
+        svg.appendChild(dl);
+        var dp=el("text",{x:cx,y:MT+ph+55,"text-anchor":"middle","class":"article-ax"});
+        dp.textContent=mode==="opt"?("targets "+r.pp+"% vs "+r.up+"%"):"both at 25%";
+        svg.appendChild(dp);
+      });
+      svg.appendChild(el("line",{x1:ML,x2:W-MR,y1:MT+ph,y2:MT+ph,stroke:"var(--line-2)","stroke-width":1}));
+      var yt=el("text",{x:ML,y:MT-12,"text-anchor":"start","class":"article-ax"});
+      yt.textContent="Incremental profit"; svg.appendChild(yt);
+
+      tbody.innerHTML=rows.map(function(r){
+        var diff=r.d;
+        return "<tr><td>"+r.m+"</td><td>"+money(r.p,r.exact)+"</td><td>"+money(r.u,r.exact)+"</td><td>"+
+          (diff>=0?"+":"−")+"$"+Math.abs(Math.round(diff)).toLocaleString("en-US")+"</td></tr>";
+      }).join("");
+    }
+    function setMode(m){
+      mode=m;
+      document.getElementById("btn-opt").setAttribute("aria-pressed",m==="opt");
+      document.getElementById("btn-fix").setAttribute("aria-pressed",m==="fix");
+      draw();
+      document.getElementById('precnote').hidden = (m!=='fix');
+    }
+    document.getElementById("btn-opt").addEventListener("click",function(){setMode("opt");});
+    document.getElementById("btn-fix").addEventListener("click",function(){setMode("fix");});
+    setMode("opt");
+
+    var Q=[
+     "<strong>Sure Things won't notice.</strong> They were always going to buy. Every $1.50 spent here is pure waste — and because their purchase probability is high, a propensity model puts them at the very top of the list.",
+     "<strong>Persuadables are the whole business case.</strong> The ad is the reason they convert. This is the only group where $1.50 buys something that wouldn't have happened, and it's the group an uplift score is built to find.",
+     "<strong>Sleeping Dogs get worse when contacted.</strong> The ad actively pushes them away. A propensity model can't see this at all; an uplift model scores them negative and drops them to the bottom, where they belong.",
+     "<strong>Lost Causes are cheap to skip.</strong> Nothing converts them, so both approaches correctly rank them low. They're the one group that's easy to get right."
+    ];
+    var qout=document.getElementById("qout"), cells=document.querySelectorAll(".article-qcell");
+    function pick(i){
+      cells.forEach(function(c){c.setAttribute("aria-pressed",+c.dataset.q===i);});
+      qout.innerHTML=Q[i];
+    }
+    cells.forEach(function(c){c.addEventListener("click",function(){pick(+c.dataset.q);});});
+    pick(0);
+  })();
+</script>
+
+
+
+
+
+
+</body></html>

@@ -26,6 +26,15 @@ pagetitle: "Insights"
   </p>
 
   <div class="insight-list">
+    <a href="Insights/the-sure-thing-problem.html" class="insight-item">
+      <div class="insight-tag">Customer Analytics · Case Study</div>
+      <div class="insight-title">The sure thing problem</div>
+      <div class="insight-desc">
+        A mobile game had proof its ads worked — conversion more than doubled in a clean
+        experiment. Ranking players by who was most likely to buy turned out to be the expensive answer.
+      </div>
+      <span class="arrow-link">Read →</span>
+    </a>
     <div class="insight-item">
       <div class="insight-tag">Coming soon</div>
       <div class="insight-title">Notes on analytics, AI, and a career in tech</div>
