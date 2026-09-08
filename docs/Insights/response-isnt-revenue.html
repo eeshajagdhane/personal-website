@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Response isn’t revenue – Eesha Jagdhane</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+</style>
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body>
+
+
+
+
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="brand">EJ.</a>
+    <ul class="nav-links">
+      <li><a href="../about.html">About</a></li>
+      <li><a href="../experience.html">Experience</a></li>
+      <li><a href="../projects.html">Projects</a></li>
+      <li><a href="../hobbies.html">Hobbies</a></li>
+      <li><a href="../insights.html" class="active">Insights</a></li>
+    </ul>
+    <a href="../contact.html" class="btn-dark">Get in touch</a>
+  </div>
+</nav>
+
+<main><header id="title-block-header" class="quarto-title-block"></header>
+<div class="page page-article reveal">
+  <a href="../insights.html" class="arrow-link article-back">← Insights</a>
+
+  <div class="eyebrow page-eyebrow">Customer Analytics · Case Study</div>
+  <h1 class="page-title">Response isn't revenue</h1>
+  <p class="article-deck">
+    Asked which email would make a customer most likely to buy, my model sent the
+    endurance-sports message to <em>70%</em> of the list. Asked which email would make the company the
+    most money, it sent that same message to 41%. Same customers, same model — one word changed in the
+    question.
+  </p>
+
+  <dl class="article-meta">
+    <div><dt>Role</dt><dd>Analyst</dd></div>
+    <div><dt>Case</dt><dd>Next-product-to-buy email targeting</dd></div>
+    <div><dt>Stack</dt><dd>Python · polars · pyrsm · scikit-learn</dd></div>
+    <div><dt>Course</dt><dd>MGTA 455, Rady School of Management</dd></div>
+  </dl>
+
+  <section class="article-section">
+    <h2>The setup</h2>
+    <p>A European sporting-goods retailer emails promotions to a very large customer base. Each
+    department — endurance, strength, water sports, team sports, backcountry, racquet — competes for
+    slots in the email calendar, and the existing policy allocated those slots <strong>at
+    random</strong>.</p>
+    <p>The proposal was to allocate by prediction instead: for each customer, work out which
+    department's message is worth the most, and send that one. Seven options per customer, counting the
+    choice to send nothing at all.</p>
+    <p>Profit per email is straightforward, given that cost of goods runs at 60%:</p>
+    <p><strong>expected profit = P(purchase) × predicted order size × 0.40</strong></p>
+    <p>Which means there are two ways to pick a winner, and they are not the same.</p>
+  </section>
+
+  <section class="article-section">
+    <h2>The same model, two questions</h2>
+    <p>Ranking each customer's seven options by <em>probability of purchase</em> gives one allocation.
+    Ranking them by <em>expected profit</em> gives another. Toggle between them.</p>
+  </section>
+
+  <div class="article-panel">
+    <div class="article-panel-head">
+      <div>
+        <div class="article-panel-title">Share of 180,000 test customers by winning message</div>
+        <div class="article-panel-sub">Which department wins depends entirely on what you ask the model to
+        maximize.</div>
+      </div>
+      <div class="article-seg" role="group" aria-label="Objective">
+        <button id="b-prof" aria-pressed="true">Maximize profit</button>
+        <button id="b-resp" aria-pressed="false">Maximize response</button>
+      </div>
+    </div>
+    <div class="article-chart-host">
+      <div class="article-chart-scroll"><svg id="shift" viewbox="0 0 720 330" role="img" aria-label="Bar chart of message allocation share under two objectives"></svg></div>
+      <div class="article-tip" id="tip1"></div>
+    </div>
+    <div class="article-tbl-wrap">
+      
+<table class="article-table caption-top">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">Message</th>
+<th data-quarto-table-cell-role="th">Best for response</th>
+<th data-quarto-table-cell-role="th">Best for profit</th>
+<th data-quarto-table-cell-role="th">Change</th>
+</tr>
+</thead>
+<tbody id="tbody">
+</tbody>
+</table>
+
+    </div>
+  </div>
+
+  <section class="article-section">
+    <p>The reshuffle is dramatic. Endurance falls from <strong>69.9%</strong> to
+    <strong>40.8%</strong>. Strength very nearly disappears — <strong>20.3%</strong> down to
+    <strong>4.6%</strong>. And two departments that were almost never the response winner become major
+    allocations: backcountry climbs from <strong>0.8%</strong> to <strong>16.7%</strong>, team sports
+    from <strong>0.9%</strong> to <strong>15.8%</strong>.</p>
+    <p>The mechanism is order size. Endurance and strength messages produce lots of small purchases —
+    running socks, protein powder. Backcountry and team messages produce fewer, larger ones — a tent,
+    a full kit for a season. Multiply a smaller probability by a much bigger basket and the ranking
+    inverts.</p>
+
+    <div class="article-callout">
+      <p>Note also what happens to the no-message option. Under the response objective it wins for
+      <strong>zero</strong> customers, because sending something always beats sending nothing if all
+      you care about is purchase probability. Under the profit objective it wins for
+      <strong>1.9%</strong> — the customers whose likely basket is too small to justify the contact.
+      Only the profit framing can ever tell you to leave someone alone.</p>
+    </div>
+  </section>
+
+  <section class="article-section">
+    <h2>What each strategy is worth</h2>
+    <p>Expected profit per emailed customer on the held-out test set, for every policy available:</p>
+  </section>
+
+  <div class="article-panel">
+    <div class="article-panel-head">
+      <div>
+        <div class="article-panel-title">Expected profit per customer, by policy</div>
+        <div class="article-panel-sub">The dashed line marks the current random-allocation policy. Hover for
+        the value at a 5,000,000-customer blast.</div>
+      </div>
+    </div>
+    <div class="article-chart-host">
+      <div class="article-chart-scroll"><svg id="ladder" viewbox="0 0 720 400" role="img" aria-label="Horizontal bar chart of expected profit per customer for each messaging policy"></svg></div>
+      <div class="article-tip" id="tip2"></div>
+    </div>
+  </div>
+
+  <div class="article-stats">
+    <div class="article-stat"><div class="article-stat-v">€0.70</div><div class="article-stat-l">Personalized, per customer</div></div>
+    <div class="article-stat"><div class="article-stat-v">€387,795</div><div class="article-stat-l">Gain vs best single message</div></div>
+    <div class="article-stat"><div class="article-stat-v">€722,562</div><div class="article-stat-l">Gain vs random allocation</div></div>
+    <div class="article-stat"><div class="article-stat-v">€1,370,057</div><div class="article-stat-l">Gain vs sending nothing</div></div>
+  </div>
+
+  <section class="article-section">
+    <p>Personalization returns <strong>€0.7045</strong> a customer. The best single message —
+    endurance for everyone — returns <strong>€0.6269</strong>. The status quo, random allocation,
+    returns <strong>€0.5600</strong>.</p>
+    <p>That last comparison is the uncomfortable one. Random allocation performs <em>worse than four
+    of the six individual messages</em>. The company was not merely failing to personalize; it was
+    actively diluting a good message with worse ones. Picking one decent message and sending it to
+    everybody would have captured <strong>€334,767</strong> of the €722,562 available — roughly
+    <strong>46% of the benefit, with no model at all</strong>.</p>
+
+    <div class="article-callout">
+      <p>Half the value of "personalization" here was really the value of not randomizing. That
+      distinction matters when someone is deciding whether to fund a modelling project, and it is
+      easy to leave out of the pitch.</p>
+    </div>
+  </section>
+
+  <section class="article-section">
+    <h2>The technical layer</h2>
+    <div class="article-tech-label">For readers who want the mechanics</div>
+
+    <details class="article-details">
+    <summary>Building a seven-way choice from two models</summary>
+    <div class="article-det-body">
+    <p>Purchase probability comes from a logistic regression on demographics, per-department purchase
+    history, and message type — with message × customer interactions, which is what allows different
+    customers to respond differently to the same message. Without those interactions every customer
+    would rank the seven messages identically and personalization would be impossible by construction.</p>
+    <p>Order size comes from a separate linear regression on the same predictors. Each customer is then
+    scored seven times, once per message, and the two predictions are multiplied and margined.</p>
+    <p>I also fitted neural network, random forest and gradient boosting versions. Personalized profit
+    came out around €0.69 for the neural network and €0.64 for random forest, against €0.7045 for the
+    logistic model — the same ordering of policies in every case.</p>
+    </div>
+    </details>
+
+    <details class="article-details">
+    <summary>The order-size model needs a closer look</summary>
+    <div class="article-det-body">
+    <p>Expected profit multiplies P(purchase) by predicted order size, and that is only correct if order
+    size means <em>order size given that they purchase</em>.</p>
+    <p>Order size is observed only for buyers. If the regression is fitted across all customers, with
+    non-buyers entered as zero, then it is already predicting an unconditional average — most of which
+    is zeros — and multiplying it by the purchase probability applies the same discount twice. The
+    result would be too low overall, and biased against messages with lower response rates.</p>
+    <p>The correct construction fits order size on buyers only. I would want to confirm which was done
+    before defending the euro figures, and it is the first thing I would check on returning to this
+    analysis. The direction of the reshuffle — bigger baskets outranking likelier ones — holds either
+    way, since it comes from relative order sizes rather than their level.</p>
+    </div>
+    </details>
+
+    <details class="article-details">
+    <summary>Why the personalized number is optimistic</summary>
+    <div class="article-det-body">
+    <p>Personalized profit is computed by taking, for each customer, the maximum of seven noisy
+    predictions. Uniform policies involve no maximum at all.</p>
+    <p>Taking a maximum over noisy estimates is systematically biased upward — whichever option happens
+    to have positive error is the one selected. With seven options and weak signal, that selection bias
+    is not negligible, and it inflates personalization's advantage specifically, because none of the
+    comparison policies are subject to it.</p>
+    <p>The honest measurement is to assign each test customer their model-recommended message and score
+    the policy against <em>realized</em> outcomes. Since the underlying experiment randomized messages,
+    the data to do that exists: take the customers who happened to receive the message the model would
+    have chosen, and compare their actual profit against the full test average. That converts the
+    estimate from a model-scored projection into something closer to a field result.</p>
+    </div>
+    </details>
+
+    <details class="article-details">
+    <summary>What I'd do differently</summary>
+    <div class="article-det-body">
+    <p><strong>Score the policy on realized outcomes,</strong> as above. It is the single change that
+    would move this from a promising projection to a defensible business case.</p>
+    <p><strong>Verify the conditional order-size specification,</strong> and if it was fitted on all
+    customers, refit on buyers and re-run the allocation.</p>
+    <p><strong>Report the no-model baseline prominently.</strong> "Stop randomizing" captures 46% of the
+    gain and requires no infrastructure. A recommendation that leads with personalization and buries
+    that comparison is not giving decision-makers what they need.</p>
+    <p><strong>Respect the frequency constraint.</strong> The case restricts how often a customer can be
+    emailed and allocates department slots monthly. My analysis optimizes a single send in isolation;
+    a real policy has to allocate a limited number of contacts across a month without exhausting
+    anyone, which is a scheduling problem sitting on top of this one and genuinely harder.</p>
+    </div>
+    </details>
+  </section>
+
+  <section class="article-section">
+    <h2>What this case taught me</h2>
+    <p><strong>The objective function is the model.</strong> Everything else here was held constant —
+    same data, same fitted coefficients, same customers — and switching from probability to profit
+    reallocated two-thirds of the list. A model doesn't answer "what should we do." It answers exactly
+    the question you encoded, and the encoding is a business decision wearing technical clothes.</p>
+    <p><strong>Likelihood and value are different quantities, and only one of them pays.</strong> The
+    message most likely to trigger a purchase is not the message worth the most, whenever purchase sizes
+    differ. Optimizing conversion rate is optimizing a proxy — usually a decent one, sometimes badly
+    wrong.</p>
+    <p><strong>Always price the boring alternative.</strong> Personalization was worth €722,562 against
+    the status quo. Doing nothing clever — just picking one good message instead of drawing at random —
+    was worth €334,767 of that. The sophisticated answer is more defensible when you have measured how
+    much of its advantage the simple answer already delivers.</p>
+    <div class="chips article-chips">
+      <span class="chip">Next-product-to-buy modeling</span>
+      <span class="chip">Objective design</span>
+      <span class="chip">Logistic regression</span>
+      <span class="chip">Order-size regression</span>
+      <span class="chip">Policy evaluation</span>
+      <span class="chip">Randomized experiment data</span>
+      <span class="chip">Selection bias</span>
+      <span class="chip">polars</span>
+    </div>
+    <p class="article-fine">Figures are from my own analysis on the course dataset. The underlying case materials
+    and data are proprietary to the publisher and are not reproduced here.</p>
+  </section>
+</div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>Based in San Diego, CA · UCSD MS Business Analytics</span>
+    <div class="footer-links">
+      <a href="https://linkedin.com/in/eesha-jagdhane" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://github.com/eeshajagdhane?tab=repositories" target="_blank" rel="noopener">GitHub</a>
+      <a href="mailto:ejagdhane99@gmail.com">Email</a>
+      <a href="../resume.pdf" target="_blank" rel="noopener">Resume</a>
+    </div>
+    <span>© 2026 Eesha Jagdhane</span>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  (function(){
+    var N=180000, BLAST=5000000;
+    var MSG=[
+      {k:"Endurance",   resp:125861, prof:73494},
+      {k:"Strength",    resp:36584,  prof:8357},
+      {k:"Racquet",     resp:12299,  prof:23757},
+      {k:"Water",       resp:2129,   prof:12567},
+      {k:"Team",        resp:1680,   prof:28361},
+      {k:"Backcountry", resp:1447,   prof:30106},
+      {k:"No message",  resp:0,      prof:3358}
+    ];
+    var POL=[
+      {k:"Personalized",        v:0.704499, hi:true},
+      {k:"Endurance to all",    v:0.626940},
+      {k:"Water to all",        v:0.603166},
+      {k:"Strength to all",     v:0.602624},
+      {k:"Backcountry to all",  v:0.594256},
+      {k:"Random (status quo)", v:0.559987, ref:true},
+      {k:"Team to all",         v:0.539639},
+      {k:"Racquet to all",      v:0.522794},
+      {k:"No message at all",   v:0.430488}
+    ];
+    function el(n,a){var e=document.createElementNS("http://www.w3.org/2000/svg",n);
+      for(var k in a)e.setAttribute(k,a[k]);return e;}
+    function eur(v){return "€"+v.toFixed(4);}
+    function eur0(v){return "€"+Math.round(v).toLocaleString("en-US");}
+    function place(tip,host,node){
+      var hb=host.getBoundingClientRect(),bb=node.getBoundingClientRect();
+      var lx=bb.left-hb.left+bb.width/2-tip.offsetWidth/2;
+      tip.style.left=Math.max(4,Math.min(lx,hb.width-tip.offsetWidth-4))+"px";
+      tip.style.top=(bb.top-hb.top-tip.offsetHeight-9)+"px";
+    }
+
+    (function(){
+      var svg=document.getElementById("shift"),tip=document.getElementById("tip1"),
+          host=svg.parentNode.parentNode,tb=document.getElementById("tbody"),mode="prof";
+      var W=720,H=330,ML=118,MR=86,MT=26,MB=36,pw=W-ML-MR,ph=H-MT-MB,XMAX=75;
+      var X=function(v){return ML+(v/XMAX)*pw;};
+      var rh=ph/MSG.length, bh=Math.min(23,rh-8);
+      var bars=[],labs=[];
+      for(var t=0;t<=75;t+=15){
+        svg.appendChild(el("line",{x1:X(t),x2:X(t),y1:MT-6,y2:MT+ph,stroke:"var(--grid)","stroke-width":1}));
+        var xl=el("text",{x:X(t),y:MT+ph+19,"text-anchor":"middle","class":"article-ax"});
+        xl.textContent=t+"%";svg.appendChild(xl);
+      }
+      MSG.forEach(function(m,i){
+        var cy=MT+rh*i+rh/2;
+        var bar=el("rect",{x:ML,y:cy-bh/2,width:2,height:bh,rx:4,fill:"var(--s-1)","class":"article-bar-t"});
+        svg.appendChild(bar);bars.push(bar);
+        var kl=el("text",{x:ML-12,y:cy+4,"text-anchor":"end","class":"article-mlab"});
+        kl.textContent=m.k;svg.appendChild(kl);
+        var vl=el("text",{x:ML+8,y:cy+4,"class":"article-vlab"});
+        svg.appendChild(vl);labs.push(vl);
+        var hit=el("rect",{x:0,y:cy-rh/2,width:W,height:rh,fill:"transparent"});
+        hit.addEventListener("mouseenter",function(){
+          bar.setAttribute("opacity",".8");
+          var r=m.resp/N*100, p=m.prof/N*100;
+          tip.innerHTML="<b>"+m.k+"</b><br>best for response: "+r.toFixed(1)+"% ("+
+            m.resp.toLocaleString("en-US")+")<br>best for profit: "+p.toFixed(1)+"% ("+
+            m.prof.toLocaleString("en-US")+")";
+          tip.style.opacity=1;place(tip,host,hit);
+        });
+        hit.addEventListener("mouseleave",function(){bar.setAttribute("opacity","1");tip.style.opacity=0;});
+        svg.appendChild(hit);
+      });
+      var xt=el("text",{x:ML,y:MT-12,"class":"article-ax"});
+      xt.textContent="Share of customers for whom this message wins";svg.appendChild(xt);
+      function draw(){
+        MSG.forEach(function(m,i){
+          var v=(mode==="prof"?m.prof:m.resp)/N*100;
+          bars[i].setAttribute("width",Math.max(2,X(v)-ML));
+          bars[i].setAttribute("fill",mode==="prof"?"var(--s-2)":"var(--s-1)");
+          labs[i].setAttribute("x",X(v)+9);
+          labs[i].textContent=v.toFixed(1)+"%";
+        });
+      }
+      tb.innerHTML=MSG.map(function(m){
+        var r=m.resp/N*100,p=m.prof/N*100,d=p-r;
+        return "<tr><td>"+m.k+"</td><td>"+r.toFixed(1)+"%</td><td>"+p.toFixed(1)+"%</td><td>"+
+          (d>=0?"+":"−")+Math.abs(d).toFixed(1)+" pts</td></tr>";
+      }).join("");
+      function set(m){
+        mode=m;
+        document.getElementById("b-prof").setAttribute("aria-pressed",m==="prof");
+        document.getElementById("b-resp").setAttribute("aria-pressed",m==="resp");
+        draw();
+      }
+      document.getElementById("b-prof").addEventListener("click",function(){set("prof");});
+      document.getElementById("b-resp").addEventListener("click",function(){set("resp");});
+      draw();
+    })();
+
+    (function(){
+      var svg=document.getElementById("ladder"),tip=document.getElementById("tip2"),
+          host=svg.parentNode.parentNode;
+      var W=720,H=400,ML=162,MR=78,MT=32,MB=38,pw=W-ML-MR,ph=H-MT-MB,XMAX=0.78;
+      var X=function(v){return ML+(v/XMAX)*pw;};
+      var rh=ph/POL.length, bh=Math.min(22,rh-8);
+      for(var t=0;t<=0.75;t+=0.15){
+        var tv=Math.round(t*100)/100;
+        svg.appendChild(el("line",{x1:X(tv),x2:X(tv),y1:MT-6,y2:MT+ph,stroke:"var(--grid)","stroke-width":1}));
+        var xl=el("text",{x:X(tv),y:MT+ph+19,"text-anchor":"middle","class":"article-ax"});
+        xl.textContent="€"+tv.toFixed(2);svg.appendChild(xl);
+      }
+      POL.forEach(function(p,i){
+        var cy=MT+rh*i+rh/2;
+        var fill=p.hi?"var(--s-2)":(p.ref?"var(--muted)":"var(--s-1)");
+        var bar=el("rect",{x:ML,y:cy-bh/2,width:Math.max(2,X(p.v)-ML),height:bh,rx:4,fill:fill});
+        svg.appendChild(bar);
+        var kl=el("text",{x:ML-12,y:cy+4,"text-anchor":"end","class":"article-mlab"});
+        kl.textContent=p.k;svg.appendChild(kl);
+        var vl=el("text",{x:X(p.v)+9,y:cy+4,"class":"article-vlab"});
+        vl.textContent="€"+p.v.toFixed(3);svg.appendChild(vl);
+        var hit=el("rect",{x:0,y:cy-rh/2,width:W,height:rh,fill:"transparent"});
+        hit.addEventListener("mouseenter",function(){
+          bar.setAttribute("opacity",".8");
+          var d=(p.v-0.559987)*BLAST;
+          tip.innerHTML="<b>"+p.k+"</b><br>"+eur(p.v)+" per customer<br>"+
+            eur0(p.v*BLAST)+" across 5,000,000<br>"+
+            (Math.abs(d)<1?"the status quo":(d>0?"+":"−")+eur0(Math.abs(d))+" vs random");
+          tip.style.opacity=1;place(tip,host,hit);
+        });
+        hit.addEventListener("mouseleave",function(){bar.setAttribute("opacity","1");tip.style.opacity=0;});
+        svg.appendChild(hit);
+      });
+      svg.appendChild(el("line",{x1:X(0.559987),x2:X(0.559987),y1:MT-6,y2:MT+ph,
+        stroke:"var(--ink)","stroke-width":1.5,"stroke-dasharray":"5 4"}));
+      var yt=el("text",{x:ML,y:MT-12,"text-anchor":"start","class":"article-ax"});
+      yt.textContent="Expected profit per emailed customer";svg.appendChild(yt);
+    })();
+  })();
+</script>
+
+
+
+
+
+
+</body></html>

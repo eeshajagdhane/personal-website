@@ -26,6 +26,33 @@ pagetitle: "Insights"
   </p>
 
   <div class="insight-list">
+    <a href="Insights/priced-for-nobody.html" class="insight-item">
+      <div class="insight-tag">Customer Analytics · Case Study</div>
+      <div class="insight-title">Priced for nobody</div>
+      <div class="insight-desc">
+        The most valuable credit card in the lineup was worth $131 a customer. It was also the
+        second-worst product the company could have launched, because almost nobody would take it.
+      </div>
+      <span class="arrow-link">Read →</span>
+    </a>
+    <a href="Insights/arithmetic-before-algorithms.html" class="insight-item">
+      <div class="insight-tag">Customer Analytics · Case Study</div>
+      <div class="insight-title">Arithmetic before algorithms</div>
+      <div class="insight-desc">
+        The same campaign hid a 24-fold arithmetic error, then seven models beat logistic
+        regression by 0.7%. The work that felt hardest paid the least.
+      </div>
+      <span class="arrow-link">Read →</span>
+    </a>
+    <a href="Insights/response-isnt-revenue.html" class="insight-item">
+      <div class="insight-tag">Customer Analytics · Case Study</div>
+      <div class="insight-title">Response isn't revenue</div>
+      <div class="insight-desc">
+        Asked which email made a purchase most likely, the model sent endurance to 70% of the list.
+        Asked which email made the most money, that share fell to 41%.
+      </div>
+      <span class="arrow-link">Read →</span>
+    </a>
     <a href="Insights/phantom-churners.html" class="insight-item">
       <div class="insight-tag">Customer Analytics · Case Study</div>
       <div class="insight-title">Phantom churners</div>

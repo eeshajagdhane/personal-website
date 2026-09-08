@@ -1,0 +1,586 @@
+---
+pagetitle: "Arithmetic before algorithms"
+---
+
+```{=html}
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="brand">EJ.</a>
+    <ul class="nav-links">
+      <li><a href="../about.html">About</a></li>
+      <li><a href="../experience.html">Experience</a></li>
+      <li><a href="../projects.html">Projects</a></li>
+      <li><a href="../hobbies.html">Hobbies</a></li>
+      <li><a href="../insights.html" class="active">Insights</a></li>
+    </ul>
+    <a href="../contact.html" class="btn-dark">Get in touch</a>
+  </div>
+</nav>
+
+<main>
+<div class="page page-article reveal">
+  <a href="../insights.html" class="arrow-link article-back">← Insights</a>
+
+  <div class="eyebrow page-eyebrow">Customer Analytics · Case Study</div>
+  <h1 class="page-title">Arithmetic before algorithms</h1>
+  <p class="article-deck">
+    I worked the same direct-mail campaign twice. The first pass was about getting the
+    economics right, and hid a <em>24-fold</em> error in a summary table. The second threw seven models
+    at it and found that the best one beat plain logistic regression by <em>0.7%</em>. Put together,
+    they say something uncomfortable about where analytical effort actually pays.
+  </p>
+
+  <dl class="article-meta">
+    <div><dt>Role</dt><dd>Analyst</dd></div>
+    <div><dt>Case</dt><dd>Direct-mail upgrade campaign, two passes</dd></div>
+    <div><dt>Stack</dt><dd>Python · polars · pyrsm · scikit-learn · XGBoost</dd></div>
+    <div><dt>Course</dt><dd>MGTA 455, Rady School of Management</dd></div>
+  </dl>
+
+  <section class="article-section">
+    <h2>The campaign</h2>
+    <p>An accounting-software company mailed an upgrade offer to its small-business customers.
+    <strong>801,821</strong> businesses received wave one; <strong>38,487</strong> bought — a 4.8%
+    response. That leaves <strong>763,334</strong> who didn't, and the question is which of them are
+    worth a second stamp.</p>
+    <p>The unit economics fit in a sentence. A mailing costs <strong>$1.41</strong>. An upgrade earns
+    <strong>$60</strong> in margin. Mailing someone pays off when their response probability clears
+    $1.41 ÷ $60 — a breakeven of <strong>2.35%</strong>.</p>
+    <p>Except wave two won't perform like wave one. These are, by definition, people who already said
+    no once, and the working assumption is that they respond at <strong>half</strong> the rate. That
+    one assumption is where the first pass got interesting.</p>
+  </section>
+
+  <hr class="article-rule">
+
+  <section class="article-section">
+    <div class="article-part"><span class="article-part-n">1</span><span class="article-part-l">First pass · the economics</span></div>
+    <h2>Where the 50% goes — twice</h2>
+    <p>The halving does two different jobs, and they are easy to conflate.</p>
+    <p><strong>Job one: it raises the bar for who gets mailed.</strong> If a customer's wave-one score
+    is 4%, their wave-two probability is really 2% — below breakeven. So the threshold on the wave-one
+    score doubles, from 2.35% to <strong>4.70%</strong>.</p>
+    <p><strong>Job two: it shrinks the revenue you book from the people you did mail.</strong> Someone
+    scored at 10% in wave one is expected to convert at 5%. Their expected revenue is 0.05 × $60, not
+    0.10 × $60.</p>
+    <p>Do only the first and the mailing list is right while every profit figure is roughly double what
+    it should be. Do only the second and you mail thousands of people who can't pay their way.</p>
+  </section>
+
+  <div class="article-panel">
+    <div class="article-panel-title">Is this customer worth a $1.41 stamp?</div>
+    <div class="article-panel-sub">Set a wave-one predicted response rate and follow the arithmetic through
+    both applications of the 50% decay.</div>
+    <div class="article-calc-grid">
+      <div>
+        <div class="article-slider-row">
+          <span class="article-slider-lab">Wave-one predicted response</span>
+          <span class="article-slider-val" id="pv">8.69%</span>
+        </div>
+        <input type="range" id="p" min="0" max="200" value="87" step="1"
+               aria-label="Wave-one predicted response rate, percent">
+        <div class="article-ticks"><span>0%</span><span>5%</span><span>10%</span><span>15%</span><span>20%</span></div>
+        <div class="verdict" id="verdict"></div>
+      </div>
+      <div class="ledger" id="ledger"></div>
+    </div>
+  </div>
+
+  <section class="article-section">
+    <p>Applying that rule to a held-out test set of 22,500 customers, with a logistic model built on
+    demographics, purchase history and geography:</p>
+  </section>
+
+  <div class="article-panel">
+    <div class="article-panel-title">Wave-two economics on the held-out test set</div>
+    <div class="article-panel-sub">Each step is the previous one after one filter or one multiplication.</div>
+    <div class="article-chart-host">
+      <div class="article-chart-scroll"><svg id="funnel" viewBox="0 0 720 300" role="img"
+        aria-label="Funnel from 22,500 test customers to 9,957 dollars of expected profit"></svg></div>
+      <div class="article-tip" id="tipf"></div>
+    </div>
+  </div>
+
+  <div class="article-stats">
+    <div class="article-stat"><div class="article-stat-v">8,322</div><div class="article-stat-l">Mailed, of 22,500</div></div>
+    <div class="article-stat"><div class="article-stat-v">$1.20</div><div class="article-stat-l">Profit per letter</div></div>
+    <div class="article-stat"><div class="article-stat-v">0.85</div><div class="article-stat-l">Return on marketing expense</div></div>
+    <div class="article-stat"><div class="article-stat-v">$9,957</div><div class="article-stat-l">Expected test-set profit</div></div>
+  </div>
+
+  <section class="article-section">
+    <p>About <strong>37%</strong> of non-responders clear the bar, and each letter returns roughly
+    <strong>$1.20</strong> against its $1.41 cost — 85 cents of profit per dollar of postage. The model
+    held its shape out of sample: $1.1588 per letter on training against $1.1965 on test.</p>
+  </section>
+
+  <section class="article-section">
+    <h2>The error I didn't catch</h2>
+    <div class="article-flagbox">
+      <p>The detailed work put the logistic model at about <strong>$1.20 of profit per mailed
+      customer</strong>. A summary table at the end of the same notebook, using the same model and the
+      same 4.70% threshold, implies about <strong>$28.47 per customer</strong> — roughly 24 times
+      higher.</p>
+      <p>That figure can't be right, and it's checkable without rerunning anything. Profit per letter
+      is (p × 0.5 × $60) − $1.41. For that to reach $28.47, the average response probability would have
+      to be about <strong>99%</strong>. The predictions in the data sit between 2% and 18%. Somewhere
+      between the two calculations a column is being read on the wrong scale.</p>
+    </div>
+    <p>The lesson is about bounds. Profit per letter here has a hard ceiling of
+    <strong>$28.59</strong> — half of $60, less the stamp. Any result brushing against a ceiling like
+    that is telling you something has gone wrong. I had the bound available the whole time and never
+    checked the summary against it.</p>
+    <p>Which is what sent me back for a second pass — this time asking a different question.</p>
+  </section>
+
+  <hr class="article-rule">
+
+  <section class="article-section">
+    <div class="article-part"><span class="article-part-n">2</span><span class="article-part-l">Second pass · the models</span></div>
+    <h2>Is a better model worth anything here?</h2>
+    <p>The economics were now settled. What remained was a narrower question: <em>how much profit is
+    left on the table by a model simple enough to explain to a marketing director?</em></p>
+    <p>So I rebuilt the analysis with seven scoring models on the same features and the same split —
+    three families, tuned and untuned — judged on the only thing that matters, which is dollars on a
+    held-out test set.</p>
+    <p>The rebuild also settled the earlier discrepancy. Running the same decision-list formula in the
+    new pipeline produced about <strong>$2.12 per letter</strong> — a plausible figure, comfortably
+    under the $28.59 ceiling. That confirms the $28.47 was a scaling fault in the first notebook's
+    prediction columns rather than anything wrong with the formula itself.</p>
+  </section>
+
+  <div class="article-panel">
+    <div class="article-panel-head">
+      <div>
+        <div class="article-panel-title">Ranking quality against money earned</div>
+        <div class="article-panel-sub">Test-set AUC on the horizontal axis, expected test-set profit on the
+        vertical. Hover any model for its full numbers.</div>
+      </div>
+    </div>
+    <div class="article-legend">
+      <div class="article-lg"><span class="article-sw article-sw-r" style="background:var(--s-1)"></span>Logistic</div>
+      <div class="article-lg"><span class="article-sw article-sw-r" style="background:var(--s-2)"></span>Neural network</div>
+      <div class="article-lg"><span class="article-sw article-sw-r" style="background:var(--s-3)"></span>Tree ensemble</div>
+    </div>
+    <div class="article-chart-host">
+      <div class="article-chart-scroll"><svg id="scatter" viewBox="0 0 720 400" role="img"
+        aria-label="Scatter plot of test AUC against test profit for seven models"></svg></div>
+      <div class="article-tip" id="tip1"></div>
+    </div>
+  </div>
+
+  <section class="article-section">
+    <p>Four models cluster tightly in the top right — tuned XGBoost, logistic regression and both
+    neural networks land between <strong>$12,914</strong> and <strong>$13,249</strong>, with AUCs
+    within 0.0015 of each other. Three tree models trail well behind.</p>
+    <p>Best result: tuned XGBoost at <strong>$13,249.17</strong>. Logistic regression:
+    <strong>$13,153.20</strong>. A difference of <strong>$95.97</strong>, or <strong>0.7%</strong>.</p>
+  </section>
+
+  <div class="article-stats">
+    <div class="article-stat"><div class="article-stat-v">$95.97</div><div class="article-stat-l">XGBoost's edge on the test set</div></div>
+    <div class="article-stat"><div class="article-stat-v">0.0009</div><div class="article-stat-l">Its edge in AUC</div></div>
+    <div class="article-stat"><div class="article-stat-v">$3,424</div><div class="article-stat-l">Edge scaled to 763,334 letters</div></div>
+    <div class="article-stat"><div class="article-stat-v">0.7%</div><div class="article-stat-l">Of campaign profit</div></div>
+  </div>
+
+  <div class="article-panel">
+    <div class="article-panel-head">
+      <div>
+        <div class="article-panel-title">Expected campaign profit, full population</div>
+        <div class="article-panel-sub">The dashed line marks plain logistic regression. Everything to its
+        right is what additional model complexity bought.</div>
+      </div>
+      <div class="article-seg" role="group" aria-label="Scale">
+        <button id="b-full" aria-pressed="true">Full population</button>
+        <button id="b-test" aria-pressed="false">Test set</button>
+      </div>
+    </div>
+    <div class="article-chart-host">
+      <div class="article-chart-scroll"><svg id="ladder" viewBox="0 0 720 340" role="img"
+        aria-label="Horizontal bar chart of expected campaign profit by model"></svg></div>
+      <div class="article-tip" id="tip2"></div>
+    </div>
+    <div class="article-tbl-wrap">
+      <table class="article-table">
+        <thead><tr><th>Model</th><th>Test AUC</th><th>Mailed</th><th>Test profit</th><th>Full population</th></tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <section class="article-section">
+    <div class="article-callout">
+      <p>Random forest mailed <strong>more</strong> customers than any other model — 6,569 — and earned
+      the <strong>least</strong>, at $343,824. Volume isn't the win. Getting the order right at the top
+      of the list is, because everyone near the 4.70% line contributes almost nothing either way.</p>
+    </div>
+    <p>The spread that matters isn't first versus second. It's the leading cluster versus the trailing
+    one: tuned XGBoost beats plain random forest by <strong>$128,838</strong>, or 37%. Choosing a
+    <em>bad</em> model is expensive. Choosing among good ones is nearly free.</p>
+  </section>
+
+  <section class="article-section">
+    <h2>Where AUC and profit disagree</h2>
+    <p>The two rankings mostly track each other, and then they don't. The untuned neural network posts
+    a higher AUC than logistic regression — 0.7663 against 0.7661 — but earns <strong>$239
+    less</strong>. Tuning it <em>lowered</em> its AUC to 0.7655 while <em>raising</em> its profit to
+    $12,956.</p>
+    <p>That's a mismatch of objectives rather than noise. AUC integrates ranking quality across the
+    whole list, including the vast middle where nobody gets mailed. Profit depends only on who lands
+    above 4.70% and how those particular customers are ordered. A model can improve its handling of
+    the bottom half — which AUC rewards — while getting slightly worse at the only region that pays.</p>
+    <div class="article-callout">
+      <p>If the decision is a threshold, evaluate at the threshold. AUC is a reasonable model-selection
+      heuristic and a poor final arbiter.</p>
+    </div>
+  </section>
+
+  <section class="article-section">
+    <h2>The technical layer</h2>
+    <div class="article-tech-label">For readers who want the mechanics</div>
+
+    <details class="article-details">
+    <summary>The full profit expression</summary>
+    <div class="article-det-body">
+    <p>For a customer with wave-one predicted probability <em>p</em>, mailed in wave two:</p>
+    <p><strong>expected profit = (p × 0.5 × $60) − $1.41</strong></p>
+    <p>Setting that to zero gives p = 1.41 ÷ 30 = 0.047. The same threshold arrives from either
+    direction: halve the response and compare to the $60 margin, or leave the response alone and compare
+    to a doubled breakeven. What you cannot do is take the doubled threshold as permission to skip the
+    halving in the revenue term — that is the double-count.</p>
+    <p>Aggregating over the mailed set in the first pass: 8,322 letters at $1.41 is $11,734.02 of cost.
+    The summed half-rate probabilities give 361.52 expected responders, worth $21,691.41 at $60 each.
+    The difference, $9,957.39, is the expected profit — and ROME is that divided by cost, 0.8486.</p>
+    </div>
+    </details>
+
+    <details class="article-details">
+    <summary>Scaling a test-set result to the real population</summary>
+    <div class="article-det-body">
+    <p>The 75,000-record dataset is a sample; the actual wave-two audience is 801,821 − 38,487 =
+    <strong>763,334</strong> businesses. Extrapolating multiplies test-set profit by the ratio of the
+    real eligible population to the eligible test sample.</p>
+    <p>Two conditions must hold. The test sample has to be representative, and the filter must match on
+    both sides — the test set is restricted to wave-one non-responders, so the population figure has to
+    exclude the 38,487 responders too. Both passes handle that correctly.</p>
+    <p>What extrapolation cannot do is manufacture precision. A per-letter error of a few cents becomes
+    tens of thousands of dollars at 763,334 letters. Since every model is scaled by the same constant,
+    the full-population column changes the magnitudes but never the ordering.</p>
+    </div>
+    </details>
+
+    <details class="article-details">
+    <summary>Why the tree models underperformed</summary>
+    <div class="article-det-body">
+    <p>Random forest and gradient boosting landed at AUCs of 0.71 to 0.73 while the linear and neural
+    models reached 0.766 or better — the reverse of what people usually expect from tree ensembles.</p>
+    <p>The likely reason is the shape of the problem. Response is rare, signal is weak and spread thin
+    across many mildly informative variables, and much of the structure — recency, spend, geography — is
+    close to monotone in the log odds. That is a setting linear models handle gracefully. Trees spend
+    their capacity looking for interactions, and when the real interactions are few, they mostly find
+    noise.</p>
+    <p>Tuned XGBoost recovers to 0.7670 because regularization and shallow depth push it back toward
+    smoothness. It wins by becoming more like the simple model, not less.</p>
+    </div>
+    </details>
+
+    <details class="article-details">
+    <summary>The geographic features need a stricter construction</summary>
+    <div class="article-det-body">
+    <p>Both passes build a zip-region response feature from observed wave-one response, which lifts AUC
+    substantially. The reasoning is that wave one has already happened, so this is information a real
+    marketer would have — and that part is sound.</p>
+    <p>What matters is <em>which rows</em> the rate is computed from. If a customer's own outcome
+    contributes to the average for their zip bin, the feature carries a trace of the answer and test-set
+    performance is flattered. The fix is to compute the rate on training rows only and map it onto the
+    test set, or to use out-of-fold estimates. I can't tell from the notebooks that this was done, which
+    means I can't rule it out — and because every model shares the feature, it would inflate all of them
+    rather than change their ordering.</p>
+    </div>
+    </details>
+
+    <details class="article-details">
+    <summary>Why response decay is an assumption, not a measurement</summary>
+    <div class="article-det-body">
+    <p>The 50% figure is given by the case, and everything downstream is proportional to it. If the true
+    decay is 40%, breakeven moves to 3.53% and the mailing list grows; at 60%, breakeven rises to 5.88%
+    and the list shrinks sharply.</p>
+    <p>Because profit per letter is small relative to the $1.41 cost, list size is quite sensitive to
+    this one number. A sensitivity analysis across a range of decay assumptions would be more useful to a
+    decision-maker than any point estimate, and it costs almost nothing — you already have the scores.</p>
+    <p>The cleaner answer is to measure it: hold out a random slice of the wave-two mailing, observe the
+    actual decay, and replace the assumption with data before scaling to 763,334.</p>
+    </div>
+    </details>
+
+    <details class="article-details">
+    <summary>What a single test set can and cannot settle</summary>
+    <div class="article-det-body">
+    <p>A $96 gap on roughly 6,300 mailed customers is about 1.5 cents per letter. There is no plausible
+    reading of one test split where that difference is real.</p>
+    <p>To say anything about first place I would need repeated splits or bootstrapped resamples and a
+    distribution of the profit difference. My expectation is that the leading four models would be
+    statistically indistinguishable and the tree pair clearly separated — which leaves the interesting
+    conclusion intact and the horse race correctly abandoned. The 37% gap between the leading cluster and
+    plain random forest is far too large to be sampling noise.</p>
+    </div>
+    </details>
+
+    <details class="article-details">
+    <summary>What I'd do differently</summary>
+    <div class="article-det-body">
+    <p><strong>Reconcile every summary against its detail.</strong> The 24× discrepancy survived into a
+    final table because nothing forced the two calculations to agree. A single assertion that per-letter
+    profit stays under $28.59 would have caught it.</p>
+    <p><strong>Recompute the zip features out-of-fold.</strong> Cheap, removes the ambiguity, and if the
+    AUC gain survives it becomes a much stronger claim.</p>
+    <p><strong>Report confidence intervals on the profit differences,</strong> and stop naming a single
+    winner when the top four sit inside the noise.</p>
+    <p><strong>Select on profit rather than AUC.</strong> Once the decision rule is a threshold,
+    cross-validating on expected profit at that threshold aligns model selection with the objective.</p>
+    <p><strong>Add cost of ownership to the comparison.</strong> The full-population gap between XGBoost
+    and logistic regression is $3,424 a campaign — which does not obviously cover retuning, monitoring
+    and explaining a boosted ensemble to a marketing team, when the logistic model hands you coefficients
+    that make the targeting rule legible to the people who approve it.</p>
+    </div>
+    </details>
+  </section>
+
+  <section class="article-section">
+    <h2>What this case taught me</h2>
+    <p>Two passes at one campaign, and the comparison between them is the actual finding.</p>
+    <p><strong>The arithmetic error was worth 24×. The model choice was worth 0.7%.</strong> One of those
+    came from an assumption applied in the wrong number of places; the other from weeks of tuning across
+    three model families. They are not remotely the same size, and the smaller one is the one that feels
+    like real work.</p>
+    <p><strong>An assumption that appears twice has to be applied twice.</strong> The 50% decay is one
+    belief about the world doing two separate jobs — deciding who is worth mailing, and deciding what
+    their response is worth. Handling it once in a two-place problem produces confident, plausible,
+    wrong numbers.</p>
+    <p><strong>Most arithmetic errors are catchable with a bound.</strong> Profit per letter cannot exceed
+    $28.59 here. Probabilities cannot exceed one. Knowing the ceiling on a number is the fastest way to
+    notice when a calculation has quietly stopped making sense — faster, and cheaper, than any amount of
+    model selection.</p>
+    <div class="chips article-chips">
+      <span class="chip">Direct-marketing economics</span>
+      <span class="chip">Breakeven analysis</span>
+      <span class="chip">Profit-based evaluation</span>
+      <span class="chip">Logistic regression</span>
+      <span class="chip">XGBoost</span>
+      <span class="chip">Random forests</span>
+      <span class="chip">Neural networks</span>
+      <span class="chip">Leakage diagnosis</span>
+      <span class="chip">Population scaling</span>
+      <span class="chip">polars</span>
+    </div>
+    <p class="article-fine">Figures are from my own analysis on the course dataset. The underlying case materials
+    and data are proprietary to the publisher and are not reproduced here.</p>
+  </section>
+</div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>Based in San Diego, CA · UCSD MS Business Analytics</span>
+    <div class="footer-links">
+      <a href="https://linkedin.com/in/eesha-jagdhane" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://github.com/eeshajagdhane?tab=repositories" target="_blank" rel="noopener">GitHub</a>
+      <a href="mailto:ejagdhane99@gmail.com">Email</a>
+      <a href="../resume.pdf" target="_blank" rel="noopener">Resume</a>
+    </div>
+    <span>© 2026 Eesha Jagdhane</span>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  (function(){
+    function el(n,a){var e=document.createElementNS("http://www.w3.org/2000/svg",n);
+      for(var k in a)e.setAttribute(k,a[k]);return e;}
+    function place(tip,host,node){
+      var hb=host.getBoundingClientRect(),bb=node.getBoundingClientRect();
+      var lx=bb.left-hb.left+bb.width/2-tip.offsetWidth/2;
+      tip.style.left=Math.max(4,Math.min(lx,hb.width-tip.offsetWidth-4))+"px";
+      tip.style.top=(bb.top-hb.top-tip.offsetHeight-9)+"px";
+    }
+
+    (function(){
+      var MARGIN=60,COST=1.41,DECAY=0.5,BE=COST/(MARGIN*DECAY);
+      var pv=document.getElementById("pv"),sl=document.getElementById("p"),
+          led=document.getElementById("ledger"),vd=document.getElementById("verdict");
+      function money(v){return (v<0?"−$":"$")+Math.abs(v).toFixed(2);}
+      function render(){
+        var p=(+sl.value)/10/100, w2=p*DECAY, rev=w2*MARGIN, net=rev-COST;
+        pv.textContent=(p*100).toFixed(2)+"%";
+        led.innerHTML=
+          "<div class='led-row'><span class='led-k'>Wave-one predicted response</span>"+
+            "<span class='led-v'>"+(p*100).toFixed(2)+"%</span></div>"+
+          "<div class='led-row'><span class='led-k'>× 50% decay → wave-two response</span>"+
+            "<span class='led-v'>"+(w2*100).toFixed(2)+"%</span></div>"+
+          "<div class='led-row'><span class='led-k'>× $60 margin → expected revenue</span>"+
+            "<span class='led-v'>"+money(rev)+"</span></div>"+
+          "<div class='led-row'><span class='led-k'>− mailing cost</span>"+
+            "<span class='led-v'>−$1.41</span></div>"+
+          "<div class='led-row tot'><span>Expected profit per letter</span>"+
+            "<span class='led-v'>"+money(net)+"</span></div>";
+        var ok=p>BE;
+        vd.innerHTML="<span class='badge "+(ok?"yes":"no")+"'>"+(ok?"Mail":"Skip")+"</span><br>"+
+          (ok? "Clears the <strong>4.70%</strong> bar. This letter returns <strong>"+money(net)+
+               "</strong> above its cost."
+             : "Falls below the <strong>4.70%</strong> bar. Mailing loses <strong>"+
+               money(Math.abs(net))+"</strong> on this customer.");
+      }
+      sl.addEventListener("input",render);render();
+    })();
+
+    (function(){
+      var svg=document.getElementById("funnel"),tip=document.getElementById("tipf"),
+          host=svg.parentNode.parentNode;
+      var steps=[
+        {k:"Test customers",v:"22,500",w:1.00,c:"var(--tan)",ink:"var(--ink)",
+         d:"Held-out wave-one non-responders available to score."},
+        {k:"Clear 4.70% bar",v:"8,322",w:0.62,c:"var(--s-1)",ink:"#fff",
+         d:"37% of the test set. Everyone else costs more to reach than they return."},
+        {k:"Expected responders",v:"361.5",w:0.40,c:"var(--s-1)",ink:"#fff",
+         d:"Sum of wave-two probabilities — each score halved before adding."},
+        {k:"Revenue at $60",v:"$21,691",w:0.40,c:"var(--s-3)",ink:"#fff",
+         d:"361.5 responders × $60 margin."},
+        {k:"Postage",v:"−$11,734",w:0.22,c:"var(--s-2)",ink:"#fff",
+         d:"8,322 letters × $1.41."},
+        {k:"Expected profit",v:"$9,957",w:0.18,c:"var(--ink)",ink:"var(--bg)",
+         d:"$1.1965 per letter mailed. ROME 0.8486."}
+      ];
+      var W=720,H=300,ML=132,MR=16,MT=18,MB=16,pw=W-ML-MR,ph=H-MT-MB;
+      var rh=ph/steps.length,bh=Math.min(28,rh-8);
+      steps.forEach(function(s,i){
+        var cy=MT+rh*i+rh/2,bw=Math.max(56,pw*s.w),g=el("g",{});
+        var r=el("rect",{x:ML,y:cy-bh/2,width:bw,height:bh,rx:4,fill:s.c});g.appendChild(r);
+        var kl=el("text",{x:ML-12,y:cy+4,"text-anchor":"end","class":"article-mlab"});
+        kl.textContent=s.k;g.appendChild(kl);
+        var vl=el("text",{x:ML+12,y:cy+4,"class":"article-vlab",fill:s.ink});
+        vl.textContent=s.v;g.appendChild(vl);
+        var hit=el("rect",{x:0,y:cy-rh/2,width:W,height:rh,fill:"transparent"});
+        hit.addEventListener("mouseenter",function(){
+          r.setAttribute("opacity",".82");
+          tip.innerHTML="<b>"+s.k+" · "+s.v+"</b><br>"+s.d;
+          tip.style.opacity=1;place(tip,host,hit);
+        });
+        hit.addEventListener("mouseleave",function(){r.setAttribute("opacity","1");tip.style.opacity=0;});
+        g.appendChild(hit);svg.appendChild(g);
+      });
+    })();
+
+    var M=[
+      {k:"XGBoost (tuned)",      f:2, auc:0.7670, mail:6263, t:13249.17, p:472661.68},
+      {k:"Logistic regression",  f:0, auc:0.7661, mail:6480, t:13153.20, p:469237.97},
+      {k:"Neural net (tuned)",   f:1, auc:0.7655, mail:6492, t:12956.28, p:462212.88},
+      {k:"Neural net",           f:1, auc:0.7663, mail:6075, t:12914.25, p:460713.47},
+      {k:"Gradient boosting",    f:2, auc:0.7270, mail:5460, t:10961.40, p:391045.91},
+      {k:"Random forest (tuned)",f:2, auc:0.7187, mail:6450, t:10465.50, p:373354.77},
+      {k:"Random forest",        f:2, auc:0.7099, mail:6569, t: 9637.71, p:343823.51}
+    ];
+    var FC=["var(--s-1)","var(--s-2)","var(--s-3)"];
+    var FN=["Logistic","Neural network","Tree ensemble"];
+    function usd(v){return "$"+v.toLocaleString("en-US",{minimumFractionDigits:2,maximumFractionDigits:2});}
+    function usd0(v){return "$"+Math.round(v).toLocaleString("en-US");}
+
+    (function(){
+      var svg=document.getElementById("scatter"),tip=document.getElementById("tip1"),
+          host=svg.parentNode.parentNode;
+      var W=720,H=400,ML=74,MR=118,MT=32,MB=54,pw=W-ML-MR,ph=H-MT-MB;
+      var x0=0.700,x1=0.775,y0=9000,y1=13800;
+      var X=function(v){return ML+(v-x0)/(x1-x0)*pw;},
+          Y=function(v){return MT+ph-(v-y0)/(y1-y0)*ph;};
+      for(var t=9000;t<=13500;t+=1500){
+        svg.appendChild(el("line",{x1:ML,x2:ML+pw,y1:Y(t),y2:Y(t),stroke:"var(--grid)","stroke-width":1}));
+        var yl=el("text",{x:ML-10,y:Y(t)+4,"text-anchor":"end","class":"article-ax"});
+        yl.textContent="$"+(t/1000).toFixed(1)+"k";svg.appendChild(yl);
+      }
+      for(var a=0.70;a<=0.7751;a+=0.025){
+        var xv=Math.round(a*1000)/1000;
+        svg.appendChild(el("line",{x1:X(xv),x2:X(xv),y1:MT,y2:MT+ph,stroke:"var(--grid)","stroke-width":1}));
+        var xl=el("text",{x:X(xv),y:MT+ph+20,"text-anchor":"middle","class":"article-ax"});
+        xl.textContent=xv.toFixed(3);svg.appendChild(xl);
+      }
+      var xt=el("text",{x:ML+pw/2,y:MT+ph+42,"text-anchor":"middle","class":"article-ax"});
+      xt.textContent="Test-set AUC →";svg.appendChild(xt);
+      var yt=el("text",{x:ML,y:MT-12,"text-anchor":"start","class":"article-ax"});
+      yt.textContent="Expected test-set profit";svg.appendChild(yt);
+      M.forEach(function(m){
+        var cx=X(m.auc),cy=Y(m.t);
+        var c=el("circle",{cx:cx,cy:cy,r:8,fill:FC[m.f],stroke:"var(--card)","stroke-width":2});
+        svg.appendChild(c);
+        var lab=el("text",{x:cx+13,y:cy+4,"class":"article-plab"});
+        lab.textContent=m.k;svg.appendChild(lab);
+        var hit=el("circle",{cx:cx,cy:cy,r:17,fill:"transparent"});
+        hit.addEventListener("mouseenter",function(){
+          c.setAttribute("r",10);
+          tip.innerHTML="<b>"+m.k+"</b><br>"+FN[m.f]+"<br>AUC "+m.auc.toFixed(4)+"<br>"+
+            m.mail.toLocaleString("en-US")+" mailed<br>"+usd(m.t)+" test profit";
+          tip.style.opacity=1;place(tip,host,hit);
+        });
+        hit.addEventListener("mouseleave",function(){c.setAttribute("r",8);tip.style.opacity=0;});
+        svg.appendChild(hit);
+      });
+    })();
+
+    (function(){
+      var svg=document.getElementById("ladder"),tip=document.getElementById("tip2"),
+          host=svg.parentNode.parentNode,tb=document.getElementById("tbody"),mode="full";
+      function draw(){
+        while(svg.firstChild)svg.removeChild(svg.firstChild);
+        var W=720,H=340,ML=152,MR=94,MT=22,MB=40,pw=W-ML-MR,ph=H-MT-MB;
+        var key=mode==="full"?"p":"t", max=mode==="full"?500000:14000;
+        var ref=mode==="full"?469237.97:13153.20, step=mode==="full"?100000:3500;
+        var X=function(v){return ML+(v/max)*pw;};
+        for(var t=0;t<=max;t+=step){
+          svg.appendChild(el("line",{x1:X(t),x2:X(t),y1:MT-4,y2:MT+ph,stroke:"var(--grid)","stroke-width":1}));
+          var xl=el("text",{x:X(t),y:MT+ph+19,"text-anchor":"middle","class":"article-ax"});
+          xl.textContent=t===0?"$0":"$"+(t/1000).toFixed(0)+"k";svg.appendChild(xl);
+        }
+        var rh=ph/M.length,bh=Math.min(24,rh-9);
+        M.forEach(function(m,i){
+          var cy=MT+rh*i+rh/2,v=m[key];
+          var bar=el("rect",{x:ML,y:cy-bh/2,width:Math.max(2,X(v)-ML),height:bh,rx:4,fill:FC[m.f]});
+          svg.appendChild(bar);
+          var kl=el("text",{x:ML-12,y:cy+4,"text-anchor":"end","class":"article-mlab"});
+          kl.textContent=m.k;svg.appendChild(kl);
+          var vl=el("text",{x:X(v)+9,y:cy+4,"class":"article-vlab"});
+          vl.textContent=mode==="full"?usd0(v):usd(v);svg.appendChild(vl);
+          var hit=el("rect",{x:0,y:cy-rh/2,width:W,height:rh,fill:"transparent"});
+          hit.addEventListener("mouseenter",function(){
+            bar.setAttribute("opacity",".8");
+            var d=m.p-469237.97;
+            tip.innerHTML="<b>"+m.k+"</b><br>"+m.mail.toLocaleString("en-US")+" mailed · AUC "+
+              m.auc.toFixed(4)+"<br>"+usd(m.t)+" test · "+usd0(m.p)+" full<br>"+
+              (Math.abs(d)<1?"the logistic benchmark":(d>0?"+":"−")+usd0(Math.abs(d))+" vs logistic");
+            tip.style.opacity=1;place(tip,host,hit);
+          });
+          hit.addEventListener("mouseleave",function(){bar.setAttribute("opacity","1");tip.style.opacity=0;});
+          svg.appendChild(hit);
+        });
+        svg.appendChild(el("line",{x1:X(ref),x2:X(ref),y1:MT-4,y2:MT+ph,stroke:"var(--ink)",
+          "stroke-width":1.5,"stroke-dasharray":"5 4"}));
+      }
+      tb.innerHTML=M.map(function(m){
+        return "<tr"+(m.f===0?" class='hi'":"")+"><td>"+m.k+"</td><td>"+m.auc.toFixed(4)+"</td><td>"+
+          m.mail.toLocaleString("en-US")+"</td><td>"+usd(m.t)+"</td><td>"+usd0(m.p)+"</td></tr>";
+      }).join("");
+      function set(m){
+        mode=m;
+        document.getElementById("b-full").setAttribute("aria-pressed",m==="full");
+        document.getElementById("b-test").setAttribute("aria-pressed",m==="test");
+        draw();
+      }
+      document.getElementById("b-full").addEventListener("click",function(){set("full");});
+      document.getElementById("b-test").addEventListener("click",function(){set("test");});
+      draw();
+    })();
+  })();
+</script>
+```

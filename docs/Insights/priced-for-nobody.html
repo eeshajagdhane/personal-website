@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Priced for nobody – Eesha Jagdhane</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+</style>
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body>
+
+
+
+
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="brand">EJ.</a>
+    <ul class="nav-links">
+      <li><a href="../about.html">About</a></li>
+      <li><a href="../experience.html">Experience</a></li>
+      <li><a href="../projects.html">Projects</a></li>
+      <li><a href="../hobbies.html">Hobbies</a></li>
+      <li><a href="../insights.html" class="active">Insights</a></li>
+    </ul>
+    <a href="../contact.html" class="btn-dark">Get in touch</a>
+  </div>
+</nav>
+
+<main><header id="title-block-header" class="quarto-title-block"></header>
+<div class="page page-article reveal">
+  <a href="../insights.html" class="arrow-link article-back">← Insights</a>
+
+  <div class="eyebrow page-eyebrow">Customer Analytics · Case Study</div>
+  <h1 class="page-title">Priced for nobody</h1>
+  <p class="article-deck">
+    The most valuable credit card in the lineup was worth <em>$131</em> a customer —
+    nearly triple its nearest rival. It was also the second-worst product the company could have
+    launched, because almost nobody would take it.
+  </p>
+
+  <dl class="article-meta">
+    <div><dt>Role</dt><dd>Analyst</dd></div>
+    <div><dt>Case</dt><dd>Credit card product design</dd></div>
+    <div><dt>Stack</dt><dd>Python · polars · pyrsm</dd></div>
+    <div><dt>Course</dt><dd>MGTA 455, Rady School of Management</dd></div>
+  </dl>
+
+  <section class="article-section">
+    <h2>The problem</h2>
+    <p>A financial-technology company was designing a credit card offer to email to 750,000 prospects.
+    Three decisions defined the product:</p>
+    <ul>
+      <li><strong>APR</strong> — 14.9%, 16.8%, or 19.8%</li>
+      <li><strong>Annual fee</strong> — none, or $20</li>
+      <li><strong>Rate type</strong> — fixed or variable</li>
+    </ul>
+    <p>Twelve possible cards. The prospect list splits into three credit-quality segments by bankruptcy
+    score — <strong>150</strong>, <strong>200</strong>, and <strong>250</strong>, where higher means
+    riskier — at 250,000 people each. Twelve products across three segments makes
+    <strong>36 cells</strong>, and the job is to work out which card to send to whom.</p>
+    <p>Each email costs <strong>$0.50</strong> in list rental. So for any cell:</p>
+    <p><strong>expected profit per email = P(response) × customer lifetime value − $0.50</strong></p>
+  </section>
+
+  <section class="article-section">
+    <h2>The tension in one line</h2>
+    <p>Every lever that makes a card more valuable makes it less attractive.</p>
+    <p>Raise the APR and each customer earns more interest — but fewer sign up. Add a $20 annual fee
+    and lifetime value rises by roughly $31 — but response collapses. The two effects pull in opposite
+    directions, and profit is their product, so neither one on its own tells you anything.</p>
+    <p>Build a card below and watch both numbers move.</p>
+  </section>
+
+  <div class="article-panel">
+    <div class="article-panel-title">Design a card</div>
+    <div class="article-panel-sub">All figures come from a logistic response model fitted to the round-one
+    test, combined with the case's lifetime-value estimates for each product and segment.</div>
+    <div class="article-design">
+      <div>
+        <div class="article-ctrl">
+          <div class="article-ctrl-lab">Annual percentage rate</div>
+          <div class="article-opts" id="c-apr"></div>
+        </div>
+        <div class="article-ctrl">
+          <div class="article-ctrl-lab">Annual fee</div>
+          <div class="article-opts" id="c-fee"></div>
+        </div>
+        <div class="article-ctrl">
+          <div class="article-ctrl-lab">Rate type</div>
+          <div class="article-opts" id="c-type"></div>
+        </div>
+        <div class="article-ctrl">
+          <div class="article-ctrl-lab">Send to segment</div>
+          <div class="article-opts" id="c-bk"></div>
+        </div>
+      </div>
+      <div>
+        <div class="article-cardface">
+          <div class="article-cf-top" id="cf-seg">Bankruptcy score 150</div>
+          <div>
+            <div class="article-cf-apr" id="cf-apr">14.9%</div>
+            <div class="article-cf-terms" id="cf-terms">Fixed rate · No annual fee</div>
+          </div>
+        </div>
+        <div class="ledger" id="ledger"></div>
+        <div class="article-rank" id="rank"></div>
+      </div>
+    </div>
+  </div>
+
+  <section class="article-section">
+    <div class="article-callout">
+      <p>Try the 19.8% fixed card with a $20 fee on segment 150. It carries the highest lifetime value
+      in the entire grid — <strong>$131</strong> — and returns <strong>9 cents</strong> an email,
+      because only 0.45% of people accept it. Then drop the fee: value falls to $100, response rises
+      more than threefold, and profit jumps to <strong>$1.00</strong>.</p>
+    </div>
+  </section>
+
+  <section class="article-section">
+    <h2>All thirty-six cells at once</h2>
+    <p>Laid out together, the structure is obvious in a way it never was in a spreadsheet.</p>
+  </section>
+
+  <div class="article-panel">
+    <div class="article-panel-title">Expected profit per email</div>
+    <div class="article-panel-sub">Twelve products down, three credit segments across. Red cells lose money.
+    Hover for the underlying response rate and lifetime value.</div>
+    <div class="article-chart-host">
+      <div class="article-hm-scroll" id="heat"></div>
+      <div class="article-tip" id="tip"></div>
+    </div>
+    <div class="article-hm-key">
+      <span>Loses money</span>
+      <div class="article-hm-ramp">
+        <span style="background:var(--neg-2)"></span><span style="background:var(--neg-1)"></span>
+        <span style="background:var(--mid)"></span><span style="background:var(--pos-1)"></span>
+        <span style="background:var(--pos-2)"></span><span style="background:var(--pos-3)"></span>
+        <span style="background:var(--pos-4)"></span>
+      </div>
+      <span>$2.33 per email</span>
+    </div>
+  </div>
+
+  <section class="article-section">
+    <p>Three things fall out immediately.</p>
+    <p><strong>Every no-fee card beats every fee-bearing card at the same APR.</strong> Without
+    exception, across all three segments. The $20 fee is never worth what it costs in response.</p>
+    <p><strong>The riskiest segment is worth far less.</strong> The 250 column is pale throughout —
+    its best cell earns $0.68 against $2.33 for the safest segment, because lifetime values there are
+    $30 lower on every product.</p>
+    <p><strong>Two cells actually lose money.</strong> The 14.9% fixed no-fee card — the single most
+    profitable product for the safest segment — is the <em>worst</em> choice for the riskiest one,
+    at <strong>−$0.36</strong> an email. Its lifetime value in that segment is $2, which cannot cover a
+    50-cent stamp at any response rate.</p>
+
+    <div class="article-callout">
+      <p>That reversal is the case in miniature. The same product swings from best to worst depending
+      on who receives it. A single company-wide "best card" doesn't exist.</p>
+    </div>
+  </section>
+
+  <section class="article-section">
+    <h2>What I recommended</h2>
+    <p>Round one tests three candidate offers per segment on 12,000 prospects. Round two sends the
+    winner to the remaining 238,000 in each segment:</p>
+  </section>
+
+  <div class="article-tbl-wrap">
+    
+<table class="article-table caption-top">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">Segment</th>
+<th data-quarto-table-cell-role="th">Card</th>
+<th data-quarto-table-cell-role="th">Per email</th>
+<th data-quarto-table-cell-role="th">Emails</th>
+<th data-quarto-table-cell-role="th">Expected profit</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>BK 150</td>
+<td>14.9% fixed, no fee</td>
+<td>$2.3276</td>
+<td>238,000</td>
+<td>$553,971</td>
+</tr>
+<tr class="even">
+<td>BK 200</td>
+<td>14.9% variable, no fee</td>
+<td>$1.6990</td>
+<td>238,000</td>
+<td>$404,357</td>
+</tr>
+<tr class="odd">
+<td>BK 250</td>
+<td>16.8% variable, no fee</td>
+<td>$0.6821</td>
+<td>238,000</td>
+<td>$162,341</td>
+</tr>
+</tbody><tfoot>
+<tr class="odd">
+<td>Round two total</td>
+<td></td>
+<td></td>
+<td>714,000</td>
+<td>$1,120,669</td>
+</tr>
+</tfoot>
+
+</table>
+
+  </div>
+
+  <section class="article-section">
+    <p>Three segments, three different cards — and notice they differ in <em>every</em> attribute
+    except the absent annual fee. The safest segment gets the lowest rate, fixed. The middle segment
+    gets the same rate but variable. The riskiest gets a higher rate, variable — because at 14.9% the
+    economics in that segment simply don't work.</p>
+  </section>
+
+  <div class="article-stats">
+    <div class="article-stat"><div class="article-stat-v">$1.12M</div><div class="article-stat-l">Expected round-two profit</div></div>
+    <div class="article-stat"><div class="article-stat-v">3.4×</div><div class="article-stat-l">Best segment vs worst, per email</div></div>
+    <div class="article-stat"><div class="article-stat-v">0</div><div class="article-stat-l">Segments where the fee wins</div></div>
+    <div class="article-stat"><div class="article-stat-v">$2.68</div><div class="article-stat-l">Spread between best and worst cell</div></div>
+  </div>
+
+  <section class="article-section">
+    <h2>The technical layer</h2>
+    <div class="article-tech-label">For readers who want the mechanics</div>
+
+    <details class="article-details">
+    <summary>Predicting cells that were never tested</summary>
+    <div class="article-det-body">
+    <p>The round-one test did not run all 36 combinations — it ran a subset. Filling in the rest means
+    fitting a logistic model on the tested cells, with APR, annual fee, rate type and bankruptcy score as
+    predictors, and using it to predict the untested ones.</p>
+    <p>This is the load-bearing assumption of the whole analysis. The model treats each attribute as
+    contributing independently to the log odds of response, so a prediction for an untested combination
+    is an extrapolation from cells that share its individual features, not an observation.</p>
+    <p>If real customers respond to <em>combinations</em> — say a variable rate is tolerable at 14.9%
+    but alarming at 19.8% — an additive model cannot see that, and its predictions for untested corners
+    will be confidently wrong. Adding interaction terms would test this, and with only a handful of
+    tested cells there is not much room to fit them.</p>
+    </div>
+    </details>
+
+    <details class="article-details">
+    <summary>Why lifetime value moves with the product</summary>
+    <div class="article-det-body">
+    <p>Lifetime value isn't a property of the customer alone — it's a property of the customer holding a
+    particular card. A higher APR earns more interest per dollar of balance, so value rises with rate. An
+    annual fee adds roughly $20 of revenue and about $31 of modelled value. And riskier segments carry
+    about $30 less value on every product, reflecting expected losses.</p>
+    <p>The extreme case is the 14.9% fixed no-fee card in segment 250, valued at <strong>$2</strong>. At
+    that level no response rate can save it: even universal acceptance yields $2 against a $0.50 cost per
+    email sent to everyone, and at the modelled 7.2% response the cell loses money.</p>
+    </div>
+    </details>
+
+    <details class="article-details">
+    <summary>What the round-one budget actually buys</summary>
+    <div class="article-det-body">
+    <p>Testing three offers on 12,000 prospects per segment means 4,000 emails per offer. At response
+    rates between 0.5% and 7%, that yields somewhere between 20 and 280 responses per cell.</p>
+    <p>The low end is the problem. Twenty responses gives a standard error large enough that two offers
+    a percentage point apart are indistinguishable. The test is well powered for the strong offers and
+    underpowered for the weak ones — which is tolerable, since the purpose is to identify a winner rather
+    than to estimate every cell precisely.</p>
+    <p>The reported $1.12M also excludes the cost of round one itself — 36,000 emails at $0.50, or
+    $18,000 — and counts only round-two profit.</p>
+    </div>
+    </details>
+
+    <details class="article-details">
+    <summary>What I'd do differently</summary>
+    <div class="article-det-body">
+    <p><strong>Put uncertainty on the recommendation.</strong> For segment 150 the top two offers sit at
+    $2.3276 and $2.3145 per email — a gap of 1.3 cents. Scaled to 238,000 emails that's $3,100, well
+    inside what sampling error can produce. I named a winner where the honest answer is a tie, and the
+    tie is worth knowing because the two cards differ in rate type.</p>
+    <p><strong>Test the additivity assumption.</strong> Fit the model with and without interaction terms
+    and compare on held-out cells. If predictions barely move, the extrapolation is trustworthy; if they
+    move a lot, the untested corners of the grid need actual testing.</p>
+    <p><strong>Reconsider what round one is for.</strong> Spending it on the three offers the model
+    already likes confirms what the model believes. Spending it on the cells where the model is
+    <em>least certain</em> would buy more information — a design question rather than a modelling one.</p>
+    <p><strong>Sanity-check the fee result.</strong> That no fee-bearing card wins in any segment is a
+    clean finding, but it rests on a modelled $31 value increment against a modelled response penalty.
+    Both come from the same limited test, and a result that uniform deserves a second look before a
+    company builds a product line on it.</p>
+    </div>
+    </details>
+  </section>
+
+  <section class="article-section">
+    <h2>What this case taught me</h2>
+    <p><strong>Per-customer value and total profit are different objectives, and optimising the first can
+    destroy the second.</strong> The highest-value card in the grid returns nine cents an email. Value
+    per acquisition means nothing until you multiply it by how many people accept — and the levers that
+    raise one systematically lower the other.</p>
+    <p><strong>"Best" is a question about a pairing, not a product.</strong> The card that earns $2.33 in
+    the safest segment loses 36 cents in the riskiest. Any recommendation phrased as a single best
+    product is answering a question nobody asked.</p>
+    <p><strong>And a grid of 36 numbers is a better analyst than a model summary.</strong> The most useful
+    artefact here wasn't a coefficient table — it was the cell-by-cell profit map, where the pattern in
+    the annual-fee column was visible instantly and needed no statistics to defend.</p>
+    <div class="chips article-chips">
+      <span class="chip">Product design analytics</span>
+      <span class="chip">Logistic regression</span>
+      <span class="chip">Design of experiments</span>
+      <span class="chip">Segment-level targeting</span>
+      <span class="chip">CLV modeling</span>
+      <span class="chip">Profit optimization</span>
+      <span class="chip">polars</span>
+    </div>
+    <p class="article-fine">Figures are from my own analysis on the course dataset. The underlying case materials
+    and data are proprietary to the publisher and are not reproduced here.</p>
+  </section>
+</div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>Based in San Diego, CA · UCSD MS Business Analytics</span>
+    <div class="footer-links">
+      <a href="https://linkedin.com/in/eesha-jagdhane" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://github.com/eeshajagdhane?tab=repositories" target="_blank" rel="noopener">GitHub</a>
+      <a href="mailto:ejagdhane99@gmail.com">Email</a>
+      <a href="../resume.pdf" target="_blank" rel="noopener">Resume</a>
+    </div>
+    <span>© 2026 Eesha Jagdhane</span>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  (function(){
+    var COST=0.50, SEG=250000;
+    var O=[
+     {o:1, apr:14.9,t:"Fixed",   f:20, r:[.016694,.019343,.022403], c:[83,63,33]},
+     {o:2, apr:14.9,t:"Variable",f:20, r:[.013845,.016049,.018599], c:[93,73,43]},
+     {o:3, apr:14.9,t:"Fixed",   f:0,  r:[.054377,.062626,.072031], c:[52,32,2]},
+     {o:4, apr:14.9,t:"Variable",f:0,  r:[.045395,.052357,.060319], c:[62,42,12]},
+     {o:5, apr:16.8,t:"Fixed",   f:20, r:[.010043,.011649,.013509], c:[103,83,53]},
+     {o:6, apr:16.8,t:"Variable",f:20, r:[.008319,.009653,.011198], c:[113,93,63]},
+     {o:7, apr:16.8,t:"Fixed",   f:0,  r:[.033221,.038390,.044328], c:[72,52,22]},
+     {o:8, apr:16.8,t:"Variable",f:0,  r:[.027631,.031960,.036941], c:[82,62,32]},
+     {o:9, apr:19.8,t:"Fixed",   f:20, r:[.004479,.005200,.006037], c:[131,111,81]},
+     {o:10,apr:19.8,t:"Variable",f:20, r:[.003707,.004304,.004998], c:[141,121,91]},
+     {o:11,apr:19.8,t:"Fixed",   f:0,  r:[.015012,.017399,.020158], c:[100,80,50]},
+     {o:12,apr:19.8,t:"Variable",f:0,  r:[.012446,.014432,.016728], c:[110,90,60]}
+    ];
+    var BK=[150,200,250];
+    function prof(o,i){return o.r[i]*o.c[i]-COST;}
+    function usd(v){return (v<0?"−$":"$")+Math.abs(v).toFixed(2);}
+    function usd0(v){return (v<0?"−$":"$")+Math.abs(Math.round(v)).toLocaleString("en-US");}
+
+    var sel={apr:14.9,fee:0,type:"Fixed",bk:0};
+    function opts(host,vals,labels,key){
+      host.innerHTML="";
+      vals.forEach(function(v,i){
+        var b=document.createElement("button");
+        b.className="opt"; b.type="button"; b.textContent=labels[i];
+        b.setAttribute("aria-pressed", sel[key]===v);
+        b.addEventListener("click",function(){sel[key]=v;renderAll();});
+        host.appendChild(b);
+      });
+    }
+    function current(){
+      for(var i=0;i<O.length;i++){
+        if(O[i].apr===sel.apr && O[i].f===sel.fee && O[i].t===sel.type) return O[i];
+      }
+      return O[0];
+    }
+    function renderAll(){
+      opts(document.getElementById("c-apr"),[14.9,16.8,19.8],["14.9%","16.8%","19.8%"],"apr");
+      opts(document.getElementById("c-fee"),[0,20],["No fee","$20 / year"],"fee");
+      opts(document.getElementById("c-type"),["Fixed","Variable"],["Fixed rate","Variable rate"],"type");
+      opts(document.getElementById("c-bk"),[0,1,2],["BK 150","BK 200","BK 250"],"bk");
+      var o=current(), i=sel.bk, r=o.r[i], c=o.c[i], p=prof(o,i);
+      document.getElementById("cf-apr").textContent=o.apr.toFixed(1)+"%";
+      document.getElementById("cf-terms").textContent=
+        o.t+" rate · "+(o.f===0?"No annual fee":"$20 annual fee");
+      document.getElementById("cf-seg").textContent="Bankruptcy score "+BK[i];
+      document.getElementById("ledger").innerHTML=
+        "<div class='led-row'><span class='led-k'>Predicted response</span><span class='led-v'>"+
+          (r*100).toFixed(2)+"%</span></div>"+
+        "<div class='led-row'><span class='led-k'>Lifetime value if they accept</span><span class='led-v'>$"+
+          c+"</span></div>"+
+        "<div class='led-row'><span class='led-k'>Expected value per email</span><span class='led-v'>"+
+          usd(r*c)+"</span></div>"+
+        "<div class='led-row'><span class='led-k'>− list rental</span><span class='led-v'>−$0.50</span></div>"+
+        "<div class='led-row tot'><span>Profit per email</span><span class='led-v'>"+usd(p)+"</span></div>"+
+        "<div class='led-row'><span class='led-k'>× 250,000 in segment</span><span class='led-v'>"+
+          usd0(p*SEG)+"</span></div>";
+      var ranked=O.map(function(x){return {o:x,p:prof(x,i)};})
+                  .sort(function(a,b){return b.p-a.p;});
+      var pos=ranked.findIndex(function(x){return x.o.o===o.o;})+1;
+      var best=ranked[0];
+      document.getElementById("rank").innerHTML= pos===1
+        ? "<strong>Best of 12</strong> for this segment. Nothing else in the lineup earns more here."
+        : "Ranks <strong>"+pos+" of 12</strong> for this segment. The winner is "+
+          best.o.apr.toFixed(1)+"% "+best.o.t.toLowerCase()+
+          (best.o.f===0?", no fee":", $20 fee")+" at <strong>"+usd(best.p)+
+          "</strong> per email — "+usd(best.p-prof(o,i))+" more.";
+    }
+    renderAll();
+
+    (function(){
+      var t=document.getElementById("heat"), tip=document.getElementById("tip"),
+          host=t.parentNode;
+      var vals=[]; O.forEach(function(o){BK.forEach(function(_,i){vals.push(prof(o,i));});});
+      var max=Math.max.apply(null,vals), min=Math.min.apply(null,vals);
+      function shade(v){
+        if(v<0) return v<min/2 ? "var(--neg-2)" : "var(--neg-1)";
+        var f=v/max;
+        if(f<0.14) return "var(--mid)";
+        if(f<0.30) return "var(--pos-1)";
+        if(f<0.52) return "var(--pos-2)";
+        if(f<0.78) return "var(--pos-3)";
+        return "var(--pos-4)";
+      }
+      function ink(v){
+        if(v<0) return v<min/2 ? "#fff" : "var(--ink)";
+        var f=v/max;
+        return f>=0.52 ? "#fff" : "var(--ink)";
+      }
+      var html="<thead><tr><th class='rowh'>Card</th>";
+      BK.forEach(function(b){html+="<th>BK "+b+"</th>";});
+      html+="</tr></thead><tbody>";
+      O.forEach(function(o){
+        html+="<tr><th class='rowh'>"+o.apr.toFixed(1)+"% "+o.t.toLowerCase()+
+              (o.f===0?", no fee":", $20 fee")+"</th>";
+        BK.forEach(function(b,i){
+          var p=prof(o,i);
+          html+="<td><div class='cell' data-o='"+o.o+"' data-i='"+i+"' style='background:"+
+                shade(p)+";color:"+ink(p)+"'>"+usd(p)+"</div></td>";
+        });
+        html+="</tr>";
+      });
+      var tbl=document.createElement("table");
+      tbl.className="hm";
+      tbl.innerHTML=html+"</tbody>";
+      t.appendChild(tbl);
+      t.querySelectorAll(".cell").forEach(function(c){
+        c.addEventListener("mouseenter",function(){
+          var o=O[+c.dataset.o-1], i=+c.dataset.i, p=prof(o,i);
+          tip.innerHTML="<b>"+o.apr.toFixed(1)+"% "+o.t.toLowerCase()+
+            (o.f===0?", no fee":", $20 fee")+" · BK "+BK[i]+"</b><br>"+
+            (o.r[i]*100).toFixed(2)+"% respond · $"+o.c[i]+" lifetime value<br>"+
+            usd(p)+" per email · "+usd0(p*SEG)+" per segment";
+          tip.style.opacity=1;
+          var hb=host.getBoundingClientRect(),bb=c.getBoundingClientRect();
+          var lx=bb.left-hb.left+bb.width/2-tip.offsetWidth/2;
+          tip.style.left=Math.max(4,Math.min(lx,hb.width-tip.offsetWidth-4))+"px";
+          tip.style.top=(bb.top-hb.top-tip.offsetHeight-8)+"px";
+        });
+        c.addEventListener("mouseleave",function(){tip.style.opacity=0;});
+      });
+    })();
+  })();
+</script>
+
+
+
+
+
+
+</body></html>
