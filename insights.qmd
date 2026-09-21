@@ -71,16 +71,6 @@ pagetitle: "Insights"
       </div>
       <span class="arrow-link">Read →</span>
     </a>
-    <a href="Insights/dont-load-what-failed.html" class="insight-item">
-      <div class="insight-tag">Data Engineering · Build</div>
-      <div class="insight-title">Don't load what failed</div>
-      <div class="insight-desc">
-        A FRED ETL pipeline for unemployment, GDP, and Treasury yields. The extract is
-        ordinary. The gate is the point: a series that fails quality checks is reported
-        and never written to the database.
-      </div>
-      <span class="arrow-link">Read →</span>
-    </a>
     <a href="Insights/dont-escalate-the-handbook.html" class="insight-item">
       <div class="insight-tag">Operations · Build</div>
       <div class="insight-title">Don't escalate the handbook</div>
@@ -88,6 +78,16 @@ pagetitle: "Insights"
         A café operations console stacked in four layers: plan and data, skill
         contracts, tools and RAG, then a review UI. A safety detector that read
         the handbook treated every dairy-free request as a medical emergency.
+      </div>
+      <span class="arrow-link">Read →</span>
+    </a>
+    <a href="Insights/dont-load-what-failed.html" class="insight-item">
+      <div class="insight-tag">Data Engineering · Build</div>
+      <div class="insight-title">Don't load what failed</div>
+      <div class="insight-desc">
+        A FRED ETL pipeline for unemployment, GDP, and Treasury yields. The extract is
+        ordinary. The gate is the point: a series that fails quality checks is reported
+        and never written to the database.
       </div>
       <span class="arrow-link">Read →</span>
     </a>

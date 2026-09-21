@@ -35,7 +35,7 @@ pagetitle: "Don't escalate the handbook"
     <div><dt>Role</dt><dd>Builder</dd></div>
     <div><dt>Case</dt><dd>Café operations console</dd></div>
     <div><dt>Stack</dt><dd>Python · Flask · RAG · pytest</dd></div>
-    <div><dt>Date</dt><dd>August 20, 2026</dd></div>
+    <div><dt>Date</dt><dd>June 2, 2026</dd></div>
   </dl>
   <p><a href="https://github.com/eeshajagdhane/brewflow-ai" class="arrow-link" target="_blank" rel="noopener">View on GitHub →</a></p>
 
