@@ -34,8 +34,9 @@ pagetitle: "Two sources, zero overlap"
     <div><dt>Role</dt><dd>Builder</dd></div>
     <div><dt>Case</dt><dd>Free-data VC deal sourcing</dd></div>
     <div><dt>Stack</dt><dd>Python · pandas · sentence-transformers</dd></div>
-    <div><dt>Date</dt><dd>August 2026</dd></div>
+    <div><dt>Date</dt><dd>September 20, 2026</dd></div>
   </dl>
+  <p><a href="https://github.com/eeshajagdhane/vc-deal-sourcing" class="arrow-link" target="_blank" rel="noopener">View on GitHub →</a></p>
 
   <section class="article-section">
     <h2>The problem</h2>
@@ -386,26 +387,6 @@ pagetitle: "Two sources, zero overlap"
           host=svg.parentNode.parentNode;
       var W=720,H=220,ML=118,MR=70,MT=16,MB=28,pw=W-ML-MR,ph=H-MT-MB,XMAX=50;
       var X=function(v){return ML+(v/XMAX)*pw;}, rh=ph/ANAT.length, bh=Math.min(36,rh-18);
-      ANAT.forEach(function(row,i){
-        var cy=MT+rh*i+rh/2, x=ML;
-        var kl=el("text",{x:ML-12,y:cy+4,"text-anchor":"end","class":"article-mlab"});
-        kl.textContent=row.k;svg.appendChild(kl);
-        FEAT.forEach(function(f){
-          var v=row[f.id];
-          if(v<=0) return;
-          var bar=el("rect",{x:x,y:cy-bh/2,width:Math.max(1,X(v)-ML-(x-ML)),height:bh,fill:f.c});
-          svg.appendChild(bar);
-          bar.addEventListener("mouseenter",function(){
-            tip.innerHTML="<b>"+row.k+" · "+f.k+"</b><br>"+v.toFixed(2)+" points of "+row.tot.toFixed(2);
-            tip.style.opacity=1;place(tip,host,bar);
-          });
-          bar.addEventListener("mouseleave",function(){tip.style.opacity=0;});
-          x+=X(v)-ML-(x-ML>0?0:0);
-          x=X(Object.keys(row).filter(function(){return false;})&&0);
-        });
-        // rebuild x properly
-      });
-      while(svg.firstChild)svg.removeChild(svg.firstChild);
       ANAT.forEach(function(row,i){
         var cy=MT+rh*i+rh/2, acc=0;
         var kl=el("text",{x:ML-12,y:cy+4,"text-anchor":"end","class":"article-mlab"});

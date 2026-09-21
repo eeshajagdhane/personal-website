@@ -130,10 +130,10 @@ pagetitle: "Eesha Jagdhane"
 
   <!-- LATEST INSIGHT + FEATURED -->
   <section class="grid-2 grid-feature reveal">
-    <a href="Insights/priced-for-nobody.html" class="card card-link">
+    <a href="Insights/two-sources-zero-overlap.html" class="card card-link">
       <div class="card-head"><span class="eyebrow">Latest insight</span></div>
-      <div class="teaser-title">Priced for nobody.</div>
-      <div class="teaser-desc">The most valuable card in the lineup was worth $131 a customer — and almost nobody would take it.</div>
+      <div class="teaser-title">Two sources, zero overlap.</div>
+      <div class="teaser-desc">438 startups, no PitchBook. Healthcare jumped from 0% to 43% of the top 30 when the thesis changed. The two sources never named the same company.</div>
       <span class="arrow-link">Read the case →</span>
     </a>
     <a href="projects.html" class="card card-dark card-link">
