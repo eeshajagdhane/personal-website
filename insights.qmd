@@ -71,24 +71,6 @@ pagetitle: "Insights"
       </div>
       <span class="arrow-link">Read →</span>
     </a>
-    <div class="insight-item">
-      <div class="insight-tag">Coming soon</div>
-      <div class="insight-title">Notes on analytics, AI, and a career in tech</div>
-      <div class="insight-desc">
-        Reflections on what I'm learning at UCSD, the tools I'm picking up, and how I think about
-        framing data problems in the real world.
-      </div>
-      <a href="#" class="arrow-link">Read →</a>
-    </div>
-    <div class="insight-item">
-      <div class="insight-tag">Coming soon</div>
-      <div class="insight-title">Building trustworthy reporting</div>
-      <div class="insight-desc">
-        Lessons from standardizing dashboards and reconciling data at Morningstar — what makes a
-        metric worth trusting.
-      </div>
-      <a href="#" class="arrow-link">Read →</a>
-    </div>
   </div>
 </div>
 </main>
