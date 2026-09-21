@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Two sources, zero overlap – Eesha Jagdhane</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+</style>
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body>
+
+
+
+
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="brand">EJ.</a>
+    <ul class="nav-links">
+      <li><a href="../about.html">About</a></li>
+      <li><a href="../experience.html">Experience</a></li>
+      <li><a href="../projects.html">Projects</a></li>
+      <li><a href="../hobbies.html">Hobbies</a></li>
+      <li><a href="../insights.html" class="active">Insights</a></li>
+    </ul>
+    <a href="../contact.html" class="btn-dark">Get in touch</a>
+  </div>
+</nav>
+
+<main><header id="title-block-header" class="quarto-title-block"></header>
+<div class="page page-article reveal">
+  <a href="../insights.html" class="arrow-link article-back">← Insights</a>
+
+  <div class="eyebrow page-eyebrow">Deal Sourcing · Build</div>
+  <h1 class="page-title">Two sources, zero overlap</h1>
+  <p class="article-deck">
+    I scored <em>438</em> startups against an AI-infrastructure thesis using only public SEC
+    filings and the Y Combinator directory — no PitchBook, no Crunchbase. Changing one sentence
+    in the thesis moved healthcare from <em>0%</em> to <em>43%</em> of the top 30. The two
+    sources still never named the same company.
+  </p>
+
+  <dl class="article-meta">
+    <div><dt>Role</dt><dd>Builder</dd></div>
+    <div><dt>Case</dt><dd>Free-data VC deal sourcing</dd></div>
+    <div><dt>Stack</dt><dd>Python · pandas · sentence-transformers</dd></div>
+    <div><dt>Date</dt><dd>August 2026</dd></div>
+  </dl>
+
+  <section class="article-section">
+    <h2>The problem</h2>
+    <p>Most deal-sourcing tools start with a paid database. I wanted to know whether a first
+    screen could be built from data anyone can pull: <strong>SEC Form D filings</strong> —
+    the public record of companies raising private capital — and the <strong>Y Combinator
+    directory</strong>, a free list of every company that accelerator has funded.</p>
+    <p>The thesis I scored against was specific: <em>AI infrastructure and developer tools;
+    Pre-Seed to Series A; US-based</em>. The output is a 0–100 fit score, a comparable-company
+    list, and a short memo for each name at the top.</p>
+  </section>
+
+  <div class="article-stats">
+    <div class="article-stat"><div class="article-stat-v">438</div><div class="article-stat-l">Companies scored</div></div>
+    <div class="article-stat"><div class="article-stat-v">400 / 38</div><div class="article-stat-l">YC directory vs SEC Form D</div></div>
+    <div class="article-stat"><div class="article-stat-v">0</div><div class="article-stat-l">Companies in both sources</div></div>
+    <div class="article-stat"><div class="article-stat-v">58.7</div><div class="article-stat-l">Highest fit score of 100</div></div>
+  </div>
+
+  <section class="article-section">
+    <h2>What each source actually knows</h2>
+    <p>The two feeds look complementary on paper. Form D gives a legal name, a location, and a
+    dollar amount being raised. YC gives a website, a description, and a sector tag. Merge them
+    and you should get a complete record.</p>
+    <p>On this snapshot they never met. In a 90-day SEC window, <strong>zero</strong> Form D
+    filers matched a YC company on website or cleaned name. That is expected more than it is a
+    bug: many YC companies raise on SAFEs that never trigger a public Form D, and YC is a thin
+    slice of every startup currently fundraising. The lasting value of the merge step is the
+    cleaning — stripping legal suffixes, fixing country labels from SEC state codes, collapsing
+    repeat filings — not a flood of matches.</p>
+    <div class="article-callout">
+      <p>A paid database papers over this. Free data makes it visible: you are ranking two
+      different kinds of company, and the score has to say so.</p>
+    </div>
+  </section>
+
+  <section class="article-section">
+    <h2>The dashboard</h2>
+    <p>This is the view I would have built in Tableau. Toggle the source and the industry mix
+    and score anatomy both shift — because the two lists are carrying different fields into
+    the same 0–100 number.</p>
+  </section>
+
+  <div class="article-panel">
+    <div class="article-panel-head">
+      <div>
+        <div class="article-panel-title">Industry mix by source</div>
+        <div class="article-panel-sub">438 companies. YC is mostly B2B software. Form D is
+        legal entities with SIC-style industry labels.</div>
+      </div>
+      <div class="article-seg" role="group" aria-label="Source">
+        <button id="b-all" aria-pressed="true">All 438</button>
+        <button id="b-yc" aria-pressed="false">YC (400)</button>
+        <button id="b-ed" aria-pressed="false">Form D (38)</button>
+      </div>
+    </div>
+    <div class="article-chart-host">
+      <div class="article-chart-scroll"><svg id="ind" viewbox="0 0 720 340" role="img" aria-label="Horizontal bar chart of company counts by industry"></svg></div>
+      <div class="article-tip" id="tip1"></div>
+    </div>
+  </div>
+
+  <div class="article-panel" style="margin-top:1.4rem;">
+    <div class="article-panel-title">Where the points come from</div>
+    <div class="article-panel-sub">Average contribution to the 0–100 score. Missing fields
+    are scored as neutral (0.5), not zero — so a YC company is not punished for having no
+    Form D amount, and a filer is not punished for having no website.</div>
+    <div class="article-legend">
+      <div class="article-lg"><span class="article-sw" style="background:var(--s-1)"></span>Thesis match</div>
+      <div class="article-lg"><span class="article-sw" style="background:var(--s-2)"></span>Stage</div>
+      <div class="article-lg"><span class="article-sw" style="background:var(--s-3)"></span>Geography</div>
+      <div class="article-lg"><span class="article-sw" style="background:var(--s-a)"></span>Traction</div>
+      <div class="article-lg"><span class="article-sw" style="background:var(--s-b)"></span>Investor signal</div>
+      <div class="article-lg"><span class="article-sw" style="background:var(--muted)"></span>Record hygiene</div>
+    </div>
+    <div class="article-chart-host">
+      <div class="article-chart-scroll"><svg id="anat" viewbox="0 0 720 220" role="img" aria-label="Stacked bars of average score components for YC versus Form D companies"></svg></div>
+      <div class="article-tip" id="tip2"></div>
+    </div>
+  </div>
+
+  <section class="article-section">
+    <p>YC companies live on <strong>thesis match</strong> — a local sentence-transformer
+    comparing the description to the thesis, worth up to 40 of the 100 points. Form D
+    companies live on <strong>stage and geography</strong>, because that is what a filing
+    actually contains. Traction is almost empty on both: GitHub, Hacker News, and public
+    job boards were looked up for a capped set of ~40 companies with websites, and most
+    startups simply do not have public engineering or hiring signal.</p>
+    <p>That is why the ceiling on this run is <strong>58.7, not 90</strong>. The model is
+    not failing to find winners. It is refusing to invent fields the sources do not provide.</p>
+  </section>
+
+  <section class="article-section">
+    <h2>Open a company</h2>
+    <p>The score is a weighted sum, so any name unpacks into six bars that add up exactly.
+    InsForge — agent-native cloud infrastructure, 12,521 GitHub stars — is the top of this
+    thesis. Several Form D names sit just behind it on stage fit, with almost no description
+    to match.</p>
+  </section>
+
+  <div class="article-panel">
+    <div class="article-panel-head">
+      <div>
+        <div class="article-panel-title">Score breakdown, top of the list</div>
+        <div class="article-panel-sub">Select a company. The six parts sum to the fit score.</div>
+      </div>
+    </div>
+    <div class="article-seg" id="coseg" role="group" aria-label="Company"></div>
+    <div class="article-chart-host">
+      <div class="article-chart-scroll"><svg id="co" viewbox="0 0 720 280" role="img" aria-label="Horizontal bar chart of one company's score components"></svg></div>
+      <div class="article-tip" id="tip3"></div>
+    </div>
+    <p class="article-fine" id="conote"></p>
+  </div>
+
+  <section class="article-section">
+    <h2>Does the score actually follow the thesis?</h2>
+    <p>Free public data has no answer key of which companies a partner would chase. So I did
+    not fake investment returns. I checked two things the system <em>can</em> be wrong about.</p>
+  </section>
+
+  <div class="article-tbl-wrap">
+    
+<table class="article-table caption-top">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">Check</th>
+<th data-quarto-table-cell-role="th">Result</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Share of healthcare in the top 30, AI-infra thesis</td>
+<td>0%</td>
+</tr>
+<tr class="even">
+<td>Same list, thesis swapped to healthcare</td>
+<td>43%</td>
+</tr>
+<tr class="odd">
+<td>Top-5 comps in the same industry</td>
+<td>77%</td>
+</tr>
+<tr class="even">
+<td>Same-industry rate by random chance</td>
+<td>39%</td>
+</tr>
+</tbody>
+</table>
+
+  </div>
+
+  <section class="article-section">
+    <p>Healthcare jumping from none of the top 30 to 43% of it is the load-bearing result.
+    The ranking is not a frozen popularity list. Change the sentence and the order moves.</p>
+    <p>Comparables are about twice as coherent as chance: a company's five nearest neighbors
+    share its industry 77% of the time against a 39% base rate. That is retrieval quality,
+    not a claim that similar companies are good investments.</p>
+    <div class="article-flagbox">
+      <p><strong>What this does not prove:</strong> that the top of the list is worth a
+      meeting. Precision against real partner decisions would need those decisions. Until
+      then the honest evaluation is behavioral — does the score respond, and are the comps
+      on-topic — not returns.</p>
+    </div>
+  </section>
+
+  <section class="article-section">
+    <h2>The technical layer</h2>
+    <div class="article-tech-label">For readers who want the mechanics</div>
+
+    <details class="article-details">
+    <summary>The 0–100 score</summary>
+    <div class="article-det-body">
+    <p>Six features, each 0 to 1, times an editable weight:</p>
+    <p><strong>score = 100 × (0.40·semantic + 0.20·stage + 0.10·geo + 0.15·traction +
+    0.10·investor + 0.05·hygiene)</strong></p>
+    <p>Semantic similarity is cosine distance between a local MiniLM embedding of the
+    company description and the thesis text. Stage is inferred from the Form D offering
+    amount against rough US venture buckets, because filings do not say "Seed." Traction
+    combines GitHub stars/recency, Hacker News mentions, and open jobs, matched on website
+    domain rather than name. Investor signal is repeat filings plus a real offering
+    amount. Hygiene is whether website, description, year, and industry are present.</p>
+    <p>Unknown features are set to <strong>0.5</strong>, not 0. Zero would systematically
+    punish whichever source did not provide the field. Neutral keeps the ranking about the
+    fields that exist, and the point breakdown still shows what is missing.</p>
+    </div>
+    </details>
+
+    <details class="article-details">
+    <summary>Why the two sources do not merge</summary>
+    <div class="article-det-body">
+    <p>Rows are treated as the same company if they share a website domain, a cleaned name
+    (legal suffixes stripped), or a near-identical name in the same US state. On this run
+    the YC–Form D overlap was zero. Repeat Form D filings for the same issuer do collapse.</p>
+    <p>Widening the SEC date window, or looking up websites for Form D issuers, would raise
+    the match rate. A 90-day slice is too short to expect YC and current fundraising to
+    coincide, and YC companies often raise in ways that never appear as Form D.</p>
+    </div>
+    </details>
+
+    <details class="article-details">
+    <summary>What the enrichment actually covered</summary>
+    <div class="article-det-body">
+    <p>GitHub, Hacker News, and public job boards are rate-limited, so enrichment is capped
+    (about 40 website-having companies per run). Of 438 names, 38 had a GitHub lookup and
+    3 had any stars; 12 had Hacker News points; 3 had open jobs on Greenhouse or Lever.</p>
+    <p>Empty traction is often the truth, not a failed scrape. Very early and non-software
+    companies do not have public repos. The notebook reports coverage rather than filling
+    gaps. That sparsity is why traction averages 0.33 points for YC and 0 for Form D —
+    and why a company like InsForge can jump the list with 12,521 stars when almost
+    nobody else has the field at all.</p>
+    </div>
+    </details>
+
+    <details class="article-details">
+    <summary>What I'd do differently</summary>
+    <div class="article-det-body">
+    <p><strong>Look up websites for Form D issuers.</strong> Without a domain, they cannot
+    be enriched or matched to YC, so they remain a parallel list scored on stage and geo.</p>
+    <p><strong>Widen the SEC window and raise the enrichment cap</strong> once a GitHub
+    token is in the environment. Traction is the feature most likely to change the ranking
+    if coverage improved.</p>
+    <p><strong>Evaluate against real decisions when they exist.</strong> Thesis-swap and
+    comp-coherence are the right tests for a system with no labels. They are not a
+    substitute for "did a partner take the meeting."</p>
+    </div>
+    </details>
+  </section>
+
+  <section class="article-section">
+    <h2>What this case taught me</h2>
+    <p><strong>A screen can be built without a paid database. A complete record cannot.</strong>
+    SEC filings know money and location. YC knows what the company says it does. Treating
+    those as one universe hides the join. Leaving them side by side, with a score that
+    shows which fields fired, is more honest.</p>
+    <p><strong>Neutral is a modeling choice, not a missing value bug.</strong> Scoring absent
+    fields as zero would have made every Form D company look worse than it is, and every
+    YC company look like it had no round. The 0.5 prior is the thing that lets two incomplete
+    sources share a ranking.</p>
+    <p><strong>If you cannot score returns, score the behavior of the score.</strong> A
+    healthcare thesis pulling healthcare into 43% of the top 30 is evidence the system
+    listens. It is not evidence the system picks winners. Those are different claims, and
+    only one of them is available on free public data.</p>
+    <div class="chips article-chips">
+      <span class="chip">Deal sourcing</span>
+      <span class="chip">SEC Form D</span>
+      <span class="chip">Entity resolution</span>
+      <span class="chip">Explainable scoring</span>
+      <span class="chip">Sentence embeddings</span>
+      <span class="chip">Evaluation without labels</span>
+      <span class="chip">Python</span>
+    </div>
+    <p class="article-fine">Figures are from my own pipeline on public SEC Form D filings and
+    the public Y Combinator directory. Company names and amounts that appear here are already
+    public. The ranked file is a snapshot, not a live feed.</p>
+  </section>
+</div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>Based in San Diego, CA · UCSD MS Business Analytics</span>
+    <div class="footer-links">
+      <a href="https://linkedin.com/in/eesha-jagdhane" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://github.com/eeshajagdhane?tab=repositories" target="_blank" rel="noopener">GitHub</a>
+      <a href="mailto:ejagdhane99@gmail.com">Email</a>
+      <a href="../resume.pdf" target="_blank" rel="noopener">Resume</a>
+    </div>
+    <span>© 2026 Eesha Jagdhane</span>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  (function(){
+    function el(n,a){var e=document.createElementNS("http://www.w3.org/2000/svg",n);
+      for(var k in a)e.setAttribute(k,a[k]);return e;}
+    function place(tip,host,node){
+      var hb=host.getBoundingClientRect(),bb=node.getBoundingClientRect();
+      var lx=bb.left-hb.left+bb.width/2-tip.offsetWidth/2;
+      tip.style.left=Math.max(4,Math.min(lx,hb.width-tip.offsetWidth-4))+"px";
+      tip.style.top=(bb.top-hb.top-tip.offsetHeight-9)+"px";
+    }
+    var IND={
+      all:[
+        ["B2B",235],["Industrials",66],["Healthcare",37],["Fintech",31],
+        ["Consumer",19],["Other Technology",12],["Other",11],["Real Estate",9]
+      ],
+      yc:[
+        ["B2B",235],["Industrials",66],["Healthcare",37],["Fintech",31],
+        ["Consumer",19],["Real Estate",9],["Government",2],["Education",1]
+      ],
+      ed:[
+        ["Other Technology",12],["Other",11],["Biotechnology",5],["Manufacturing",5],
+        ["Computers",2],["Business Services",2],["Agriculture",1]
+      ]
+    };
+    var FEAT=[
+      {k:"Thesis match",id:"sem",c:"var(--s-1)"},
+      {k:"Stage",id:"stg",c:"var(--s-2)"},
+      {k:"Geography",id:"geo",c:"var(--s-3)"},
+      {k:"Traction",id:"trc",c:"var(--s-a)"},
+      {k:"Investor signal",id:"inv",c:"var(--s-b)"},
+      {k:"Hygiene",id:"hyg",c:"var(--muted)"}
+    ];
+    var ANAT=[
+      {k:"YC directory", n:400, sem:14.22, stg:10.00, geo:9.31, trc:0.33, inv:0.00, hyg:3.74, tot:37.61},
+      {k:"SEC Form D",   n:38,  sem:6.93,  stg:18.39, geo:10.00,trc:0.00, inv:3.39, hyg:2.14, tot:40.85}
+    ];
+    var COS=[
+      {name:"InsForge", src:"YC", ind:"B2B", st:"CA", score:58.7, sem:19.95, stg:10, geo:10, trc:15, inv:0, hyg:3.75, note:"12,521 GitHub stars · HN 62. Top of the AI-infra thesis because traction actually exists."},
+      {name:"Interfaze", src:"YC", ind:"B2B", st:"CA", score:55.82, sem:17.07, stg:10, geo:10, trc:15, inv:0, hyg:3.75, note:"Specialized model architecture. Traction from HN (164) more than GitHub."},
+      {name:"RentAHuman", src:"YC", ind:"Consumer", st:"CA", score:55.3, sem:20.58, stg:10, geo:10, trc:10.97, inv:0, hyg:3.75, note:"Highest thesis-match points in the top three — a reminder that semantic fit is not the same as B2B."},
+      {name:"Gaingels Core Automation", src:"Form D", ind:"Other", st:"VT", score:51.89, sem:15.99, stg:20, geo:10, trc:0, inv:3.4, hyg:2.5, note:"Early-stage filing, $4.1M. Almost no description. Stage and geo do the work."},
+      {name:"i2 Health Advisors", src:"Form D", ind:"Other Technology", st:"WA", score:50.15, sem:14.25, stg:20, geo:10, trc:0, inv:3.4, hyg:2.5, note:"$3.5M Early filing. Sits in the top five with no website and no traction field."},
+      {name:"OpenProse", src:"YC", ind:"B2B", st:"CA", score:47.37, sem:23.62, stg:10, geo:10, trc:0, inv:0, hyg:3.75, note:"Highest thesis-match points of anyone shown — and zero traction. Pure description fit."}
+    ];
+
+    (function(){
+      var svg=document.getElementById("ind"), tip=document.getElementById("tip1"),
+          host=svg.parentNode.parentNode, mode="all";
+      function draw(){
+        while(svg.firstChild)svg.removeChild(svg.firstChild);
+        var rows=IND[mode], W=720,H=340,ML=150,MR=56,MT=18,MB=28,pw=W-ML-MR,ph=H-MT-MB;
+        var max=Math.max.apply(null,rows.map(function(r){return r[1];}));
+        var X=function(v){return ML+(v/max)*pw;}, rh=ph/rows.length, bh=Math.min(22,rh-8);
+        rows.forEach(function(r,i){
+          var cy=MT+rh*i+rh/2;
+          var bar=el("rect",{x:ML,y:cy-bh/2,width:Math.max(2,X(r[1])-ML),height:bh,rx:4,fill:"var(--s-1)"});
+          svg.appendChild(bar);
+          var kl=el("text",{x:ML-12,y:cy+4,"text-anchor":"end","class":"article-mlab"});
+          kl.textContent=r[0];svg.appendChild(kl);
+          var vl=el("text",{x:X(r[1])+8,y:cy+4,"class":"article-vlab"});
+          vl.textContent=r[1];svg.appendChild(vl);
+          var hit=el("rect",{x:0,y:cy-rh/2,width:W,height:rh,fill:"transparent"});
+          hit.addEventListener("mouseenter",function(){
+            bar.setAttribute("opacity",".8");
+            tip.innerHTML="<b>"+r[0]+"</b><br>"+r[1]+" companies in this cut";
+            tip.style.opacity=1;place(tip,host,hit);
+          });
+          hit.addEventListener("mouseleave",function(){bar.setAttribute("opacity","1");tip.style.opacity=0;});
+          svg.appendChild(hit);
+        });
+      }
+      function set(m){
+        mode=m;
+        document.getElementById("b-all").setAttribute("aria-pressed",m==="all");
+        document.getElementById("b-yc").setAttribute("aria-pressed",m==="yc");
+        document.getElementById("b-ed").setAttribute("aria-pressed",m==="ed");
+        draw();
+      }
+      document.getElementById("b-all").addEventListener("click",function(){set("all");});
+      document.getElementById("b-yc").addEventListener("click",function(){set("yc");});
+      document.getElementById("b-ed").addEventListener("click",function(){set("ed");});
+      draw();
+    })();
+
+    (function(){
+      var svg=document.getElementById("anat"), tip=document.getElementById("tip2"),
+          host=svg.parentNode.parentNode;
+      var W=720,H=220,ML=118,MR=70,MT=16,MB=28,pw=W-ML-MR,ph=H-MT-MB,XMAX=50;
+      var X=function(v){return ML+(v/XMAX)*pw;}, rh=ph/ANAT.length, bh=Math.min(36,rh-18);
+      ANAT.forEach(function(row,i){
+        var cy=MT+rh*i+rh/2, x=ML;
+        var kl=el("text",{x:ML-12,y:cy+4,"text-anchor":"end","class":"article-mlab"});
+        kl.textContent=row.k;svg.appendChild(kl);
+        FEAT.forEach(function(f){
+          var v=row[f.id];
+          if(v<=0) return;
+          var bar=el("rect",{x:x,y:cy-bh/2,width:Math.max(1,X(v)-ML-(x-ML)),height:bh,fill:f.c});
+          svg.appendChild(bar);
+          bar.addEventListener("mouseenter",function(){
+            tip.innerHTML="<b>"+row.k+" · "+f.k+"</b><br>"+v.toFixed(2)+" points of "+row.tot.toFixed(2);
+            tip.style.opacity=1;place(tip,host,bar);
+          });
+          bar.addEventListener("mouseleave",function(){tip.style.opacity=0;});
+          x+=X(v)-ML-(x-ML>0?0:0);
+          x=X(Object.keys(row).filter(function(){return false;})&&0);
+        });
+        // rebuild x properly
+      });
+      while(svg.firstChild)svg.removeChild(svg.firstChild);
+      ANAT.forEach(function(row,i){
+        var cy=MT+rh*i+rh/2, acc=0;
+        var kl=el("text",{x:ML-12,y:cy+4,"text-anchor":"end","class":"article-mlab"});
+        kl.textContent=row.k;svg.appendChild(kl);
+        FEAT.forEach(function(f){
+          var v=row[f.id];
+          if(v<=0) return;
+          var x0=X(acc), x1=X(acc+v);
+          var bar=el("rect",{x:x0,y:cy-bh/2,width:Math.max(1,x1-x0),height:bh,fill:f.c});
+          svg.appendChild(bar);
+          bar.addEventListener("mouseenter",function(){
+            tip.innerHTML="<b>"+row.k+" · "+f.k+"</b><br>"+v.toFixed(2)+" of "+row.tot.toFixed(2)+" average points";
+            tip.style.opacity=1;place(tip,host,bar);
+          });
+          bar.addEventListener("mouseleave",function(){tip.style.opacity=0;});
+          acc+=v;
+        });
+        var vl=el("text",{x:X(row.tot)+8,y:cy+4,"class":"article-vlab"});
+        vl.textContent=row.tot.toFixed(1);svg.appendChild(vl);
+      });
+    })();
+
+    (function(){
+      var svg=document.getElementById("co"), tip=document.getElementById("tip3"),
+          host=svg.parentNode.parentNode, seg=document.getElementById("coseg"),
+          note=document.getElementById("conote"), idx=0;
+      COS.forEach(function(c,i){
+        var b=document.createElement("button");
+        b.type="button"; b.textContent=c.name.split(" ")[0];
+        b.setAttribute("aria-pressed", i===0);
+        b.addEventListener("click",function(){idx=i;draw();});
+        seg.appendChild(b);
+      });
+      function draw(){
+        while(svg.firstChild)svg.removeChild(svg.firstChild);
+        var c=COS[idx], rows=FEAT.map(function(f){return {k:f.k,c:f.c,v:c[f.id]};});
+        Array.prototype.forEach.call(seg.children,function(b,i){
+          b.setAttribute("aria-pressed", i===idx);
+        });
+        note.textContent=c.src+" · "+c.ind+" · "+c.st+" · score "+c.score+". "+c.note;
+        var W=720,H=280,ML=130,MR=56,MT=10,MB=16,pw=W-ML-MR,ph=H-MT-MB,XMAX=25;
+        var X=function(v){return ML+(v/XMAX)*pw;}, rh=ph/rows.length, bh=Math.min(22,rh-8);
+        rows.forEach(function(r,i){
+          var cy=MT+rh*i+rh/2;
+          var bar=el("rect",{x:ML,y:cy-bh/2,width:Math.max(2,X(r.v)-ML),height:bh,rx:4,fill:r.c});
+          svg.appendChild(bar);
+          var kl=el("text",{x:ML-12,y:cy+4,"text-anchor":"end","class":"article-mlab"});
+          kl.textContent=r.k;svg.appendChild(kl);
+          var vl=el("text",{x:X(r.v)+8,y:cy+4,"class":"article-vlab"});
+          vl.textContent=r.v.toFixed(2);svg.appendChild(vl);
+        });
+      }
+      draw();
+    })();
+  })();
+</script>
+
+
+
+
+
+
+</body></html>

@@ -33,7 +33,7 @@ pagetitle: "The sure thing problem"
     <div><dt>Role</dt><dd>Analyst</dd></div>
     <div><dt>Case</dt><dd>Mobile game ad targeting</dd></div>
     <div><dt>Stack</dt><dd>Python · polars · pyrsm · scikit-learn</dd></div>
-    <div><dt>Course</dt><dd>MGTA 455, Rady School of Management</dd></div>
+    <div><dt>Date</dt><dd>February 19, 2026</dd></div>
   </dl>
 
   <section class="article-section">
@@ -205,7 +205,7 @@ pagetitle: "The sure thing problem"
     <details class="article-details">
     <summary>Validating the implementation across two libraries</summary>
     <div class="article-det-body">
-    <p>I built every model twice — once through the course's <code>pyrsm</code> wrapper, once directly
+    <p>I built every model twice — once through the <code>pyrsm</code> wrapper, once directly
     in scikit-learn — then correlated the predictions to check the pipeline.</p>
     <p>Random forest agreed almost perfectly (0.999 on treatment predictions, 0.995 on uplift), and
     gradient boosting nearly as closely (0.975 / 0.979). The neural network came in far lower, at 0.595
@@ -254,7 +254,7 @@ pagetitle: "The sure thing problem"
       <span class="chip">polars</span>
       <span class="chip">scikit-learn</span>
     </div>
-    <p class="article-fine">Figures are from my own analysis on the course dataset. The underlying case materials
+    <p class="article-fine">Figures are from my own analysis on the case dataset. The underlying case materials
     and data are proprietary to the publisher and are not reproduced here.</p>
   </section>
 </div>

@@ -34,7 +34,7 @@ pagetitle: "Response isn't revenue"
     <div><dt>Role</dt><dd>Analyst</dd></div>
     <div><dt>Case</dt><dd>Next-product-to-buy email targeting</dd></div>
     <div><dt>Stack</dt><dd>Python · polars · pyrsm · scikit-learn</dd></div>
-    <div><dt>Course</dt><dd>MGTA 455, Rady School of Management</dd></div>
+    <div><dt>Date</dt><dd>February 26, 2026</dd></div>
   </dl>
 
   <section class="article-section">
@@ -240,7 +240,7 @@ pagetitle: "Response isn't revenue"
       <span class="chip">Selection bias</span>
       <span class="chip">polars</span>
     </div>
-    <p class="article-fine">Figures are from my own analysis on the course dataset. The underlying case materials
+    <p class="article-fine">Figures are from my own analysis on the case dataset. The underlying case materials
     and data are proprietary to the publisher and are not reproduced here.</p>
   </section>
 </div>

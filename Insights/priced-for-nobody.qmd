@@ -33,7 +33,7 @@ pagetitle: "Priced for nobody"
     <div><dt>Role</dt><dd>Analyst</dd></div>
     <div><dt>Case</dt><dd>Credit card product design</dd></div>
     <div><dt>Stack</dt><dd>Python · polars · pyrsm</dd></div>
-    <div><dt>Course</dt><dd>MGTA 455, Rady School of Management</dd></div>
+    <div><dt>Date</dt><dd>March 12, 2026</dd></div>
   </dl>
 
   <section class="article-section">
@@ -272,7 +272,7 @@ pagetitle: "Priced for nobody"
       <span class="chip">Profit optimization</span>
       <span class="chip">polars</span>
     </div>
-    <p class="article-fine">Figures are from my own analysis on the course dataset. The underlying case materials
+    <p class="article-fine">Figures are from my own analysis on the case dataset. The underlying case materials
     and data are proprietary to the publisher and are not reproduced here.</p>
   </section>
 </div>
