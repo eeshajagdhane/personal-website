@@ -863,7 +863,14 @@ a.insight-item { display: block; color: inherit; cursor: pointer; }
 }
 .page-article .led-row:last-child { border-bottom: 0; }
 .page-article .led-row.tot { background: var(--tan); font-weight: 600; color: var(--ink); }
-.page-article .led-k { color: var(--muted); }
+.page-article .led-k { color: var(--muted); flex: 1; min-width: 0; }
+.page-article .led-detail {
+  display: block;
+  font-weight: 400;
+  color: var(--body);
+  margin-top: 3px;
+  line-height: 1.45;
+}
 .page-article .led-v { font-variant-numeric: tabular-nums; color: var(--ink); font-weight: 500; white-space: nowrap; }
 .article-rank {
   margin-top: 13px;

@@ -312,10 +312,9 @@ pagetitle: "Don't escalate the handbook"
       });
       var s=DEFS[id], html="";
       s.rows.forEach(function(r){
-        html+="<div class='led-row'><span class='led-k'>"+r.n+"</span><span class='led-v'>"+
+        html+="<div class='led-row'><span class='led-k'>"+r.n+
+          "<span class='led-detail'>"+r.d+"</span></span><span class='led-v'>"+
           (r.ok?"clear":"flag")+"</span></div>";
-        html+="<div class='led-row'><span class='led-k' style='font-weight:400;color:var(--ink-mute)'>"+
-          r.d+"</span><span class='led-v'></span></div>";
       });
       html+="<div class='led-row tot'><span>Escalate as allergy?</span><span class='led-v'>"+
         (s.escalate?"yes":"no")+"</span></div>";

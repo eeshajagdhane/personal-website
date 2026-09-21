@@ -344,10 +344,9 @@ pagetitle: "Don't load what failed"
       var s=DEFS[id], html="", pass=true;
       s.rows.forEach(function(r){
         if(!r.ok) pass=false;
-        html+="<div class='led-row'><span class='led-k'>"+r.n+"</span><span class='led-v'>"+
+        html+="<div class='led-row'><span class='led-k'>"+r.n+
+          "<span class='led-detail'>"+r.d+"</span></span><span class='led-v'>"+
           (r.ok?"pass":"fail")+"</span></div>";
-        html+="<div class='led-row'><span class='led-k' style='font-weight:400;color:var(--ink-mute)'>"+
-          r.d+"</span><span class='led-v'></span></div>";
       });
       html+="<div class='led-row tot'><span>Load into DuckDB?</span><span class='led-v'>"+
         (pass?"yes":"no")+"</span></div>";
