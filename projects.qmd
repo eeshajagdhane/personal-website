@@ -54,11 +54,35 @@ pagetitle: "Projects"
     <div class="proj-card">
       <div class="proj-tags">
         <span class="proj-tag">Python</span>
+        <span class="proj-tag">DuckDB</span>
+        <span class="proj-tag">Data Quality</span>
+      </div>
+      <div class="proj-title">FRED ETL Pipeline</div>
+      <div class="proj-sub">A validated extract-transform-load pipeline for public Federal Reserve data.</div>
+      <div class="proj-block">
+        <div class="proj-block-label">Context</div>
+        <div class="proj-block-text">Dashboards inherit silent data problems — missing dates, duplicated keys, out-of-range values — unless something refuses to load them.</div>
+      </div>
+      <div class="proj-block">
+        <div class="proj-block-label">Approach</div>
+        <div class="proj-block-text">Pulled unemployment, GDP, and 10-year Treasury yields from FRED, transformed them into a tidy table, and ran five quality checks. Only series that passed every check were upserted into DuckDB.</div>
+      </div>
+      <div class="proj-block">
+        <div class="proj-block-label">Outcome</div>
+        <div class="proj-block-text">Failed series write a timestamped QA report and never enter the analytics table. Value nulls from FRED's missing marker are reported, not rejected.</div>
+      </div>
+      <a href="Insights/dont-load-what-failed.html" class="arrow-link">Read the write-up →</a>
+      <a href="https://github.com/eeshajagdhane/public-data-etl-pipeline" class="arrow-link" target="_blank" rel="noopener">View on GitHub →</a>
+    </div>
+
+    <div class="proj-card">
+      <div class="proj-tags">
+        <span class="proj-tag">Python</span>
         <span class="proj-tag">SQL</span>
         <span class="proj-tag">Agentic AI</span>
       </div>
-      <div class="proj-title">Agentic Nurse</div>
-      <div class="proj-sub">An agentic AI prototype that surfaces early patient-deterioration alerts.</div>
+      <div class="proj-title">Agentic Nurse Chatbot</div>
+      <div class="proj-sub">An agentic AI chatbot prototype that surfaces early patient-deterioration alerts.</div>
       <div class="proj-block">
         <div class="proj-block-label">Context</div>
         <div class="proj-block-text">Nurses need earlier signals of patient deterioration without adding manual monitoring load.</div>

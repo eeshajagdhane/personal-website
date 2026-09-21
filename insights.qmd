@@ -36,6 +36,16 @@ pagetitle: "Insights"
       </div>
       <span class="arrow-link">Read →</span>
     </a>
+    <a href="Insights/dont-load-what-failed.html" class="insight-item">
+      <div class="insight-tag">Data Engineering · Build</div>
+      <div class="insight-title">Don't load what failed</div>
+      <div class="insight-desc">
+        A FRED ETL pipeline for unemployment, GDP, and Treasury yields. The extract is
+        ordinary. The gate is the point: a series that fails quality checks is reported
+        and never written to the database.
+      </div>
+      <span class="arrow-link">Read →</span>
+    </a>
     <a href="Insights/priced-for-nobody.html" class="insight-item">
       <div class="insight-tag">Customer Analytics · Case Study</div>
       <div class="insight-title">Priced for nobody</div>

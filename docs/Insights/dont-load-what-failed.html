@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Don’t load what failed – Eesha Jagdhane</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+.display.math{display: block; text-align: center; margin: 0.5rem auto;}
+</style>
+
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+<link rel="stylesheet" href="../styles.css">
+</head>
+
+<body>
+
+
+
+
+
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="brand">EJ.</a>
+    <ul class="nav-links">
+      <li><a href="../about.html">About</a></li>
+      <li><a href="../experience.html">Experience</a></li>
+      <li><a href="../projects.html">Projects</a></li>
+      <li><a href="../hobbies.html">Hobbies</a></li>
+      <li><a href="../insights.html" class="active">Insights</a></li>
+    </ul>
+    <a href="../contact.html" class="btn-dark">Get in touch</a>
+  </div>
+</nav>
+
+<main><header id="title-block-header" class="quarto-title-block"></header>
+<div class="page page-article reveal">
+  <a href="../insights.html" class="arrow-link article-back">← Insights</a>
+
+  <div class="eyebrow page-eyebrow">Data Engineering · Build</div>
+  <h1 class="page-title">Don't load what failed</h1>
+  <p class="article-deck">
+    I built an ETL pipeline for public FRED data — unemployment, GDP, and the 10-year
+    Treasury yield. The extract is ordinary. The point is the gate: a series that fails
+    schema, continuity, range, or duplicate checks is written to a QA report and
+    <em>never enters the database</em>.
+  </p>
+
+  <dl class="article-meta">
+    <div><dt>Role</dt><dd>Builder</dd></div>
+    <div><dt>Case</dt><dd>FRED economic-data ETL</dd></div>
+    <div><dt>Stack</dt><dd>Python · pandas · DuckDB · pytest</dd></div>
+    <div><dt>Date</dt><dd>September 20, 2026</dd></div>
+  </dl>
+  <p><a href="https://github.com/eeshajagdhane/public-data-etl-pipeline" class="arrow-link" target="_blank" rel="noopener">View on GitHub →</a></p>
+
+  <section class="article-section">
+    <h2>The problem</h2>
+    <p>Dashboards inherit whatever you feed them. A silent schema change, a stretch of
+    missing dates, a duplicated observation, or a value with the decimal in the wrong
+    place will not announce itself. It will just sit in every chart downstream.</p>
+    <p>I wanted a pipeline where that cannot happen quietly. Three public FRED series
+    go in. Five data-quality checks run. Only series that pass every check are upserted
+    into DuckDB. Failures still produce a timestamped markdown report — they just do
+    not become “official” rows.</p>
+  </section>
+
+  <div class="article-stats">
+    <div class="article-stat"><div class="article-stat-v">3</div><div class="article-stat-l">FRED series</div></div>
+    <div class="article-stat"><div class="article-stat-v">5</div><div class="article-stat-l">Quality checks per series</div></div>
+    <div class="article-stat"><div class="article-stat-v">0</div><div class="article-stat-l">Failed series loaded</div></div>
+    <div class="article-stat"><div class="article-stat-v">"." → NaN</div><div class="article-stat-l">FRED's missing marker</div></div>
+  </div>
+
+  <section class="article-section">
+    <h2>What gets pulled</h2>
+    <p>The series are deliberately different cadences, because continuity is not one
+    number. Monthly unemployment, quarterly GDP, and a daily Treasury yield each need
+    their own idea of “too large a gap.”</p>
+  </section>
+
+  <div class="article-tbl-wrap">
+    
+<table class="article-table caption-top">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th">Series</th>
+<th data-quarto-table-cell-role="th">What it is</th>
+<th data-quarto-table-cell-role="th">Frequency</th>
+<th data-quarto-table-cell-role="th">Max gap</th>
+<th data-quarto-table-cell-role="th">Plausible range</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>UNRATE</td>
+<td>Civilian unemployment rate</td>
+<td>Monthly</td>
+<td>45 days</td>
+<td>0 to 50%</td>
+</tr>
+<tr class="even">
+<td>GDP</td>
+<td>Gross domestic product</td>
+<td>Quarterly</td>
+<td>100 days</td>
+<td>0 to $1,000,000B</td>
+</tr>
+<tr class="odd">
+<td>DGS10</td>
+<td>10-year Treasury yield</td>
+<td>Daily</td>
+<td>4 days</td>
+<td>−5 to 25%</td>
+</tr>
+</tbody>
+</table>
+
+  </div>
+  <p class="article-fine">Ranges are wide plausibility bounds, not forecasts. Their job is to catch a negative unemployment rate or a misplaced decimal, not to predict next quarter.</p>
+
+  <section class="article-section">
+    <h2>Five checks, one gate</h2>
+    <p>Each series is tested independently. The series as a whole loads only if every
+    check returns pass. Select a check to see what it actually asks.</p>
+  </section>
+
+  <div class="article-panel">
+    <div class="article-panel-head">
+      <div>
+        <div class="article-panel-title">What each check allows</div>
+        <div class="article-panel-sub">The interesting design is not “flag nulls.” It is which nulls are allowed.</div>
+      </div>
+    </div>
+    <div class="article-seg" role="group" aria-label="Quality check">
+      <button id="c-schema" aria-pressed="true">Schema</button>
+      <button id="c-null" aria-pressed="false">Nulls</button>
+      <button id="c-gap" aria-pressed="false">Continuity</button>
+      <button id="c-range" aria-pressed="false">Range</button>
+      <button id="c-dup" aria-pressed="false">Duplicates</button>
+    </div>
+    <div class="article-qout" id="cout"></div>
+  </div>
+
+  <section class="article-section">
+    <h2>Break a series and watch the gate</h2>
+    <p>This is the decision the pipeline makes, using the same rules as the tests.
+    A missing <em>value</em> is FRED being honest. A missing <em>date</em> is a broken
+    identity. Only one of those is allowed through.</p>
+  </section>
+
+  <div class="article-panel">
+    <div class="article-panel-head">
+      <div>
+        <div class="article-panel-title">Should this series load?</div>
+        <div class="article-panel-sub">Pick a defect. The five checks run; the load decision follows.</div>
+      </div>
+    </div>
+    <div class="article-seg" role="group" aria-label="Defect">
+      <button id="d-clean" aria-pressed="true">Clean monthly</button>
+      <button id="d-vnull" aria-pressed="false">Null value</button>
+      <button id="d-dnull" aria-pressed="false">Null date</button>
+      <button id="d-gap" aria-pressed="false">90-day gap</button>
+      <button id="d-range" aria-pressed="false">UNRATE = 999</button>
+      <button id="d-dup" aria-pressed="false">Duplicate row</button>
+    </div>
+    <div class="ledger" id="ledger"></div>
+    <div class="verdict" id="verdict"></div>
+  </div>
+
+  <section class="article-section">
+    <div class="article-callout">
+      <p>FRED encodes a missing observation as the character <strong>"."</strong>. The
+      transform turns that into NaN before any check runs. If I had treated every null
+      as a failure, every Treasury series would fail on market holidays. The null check
+      fails only on <code>date</code> and <code>series_id</code> — the columns that
+      identify a row. Value nulls are counted and reported, then passed.</p>
+    </div>
+    <p>Daily continuity uses a <strong>4-day</strong> threshold so Friday-to-Monday
+    (3 days) is not an outage, while a real multi-day hole is. Holidays still appear
+    as null-valued rows, which the null check already sees. Two different absences,
+    two different checks.</p>
+  </section>
+
+  <section class="article-section">
+    <h2>What happens after a pass</h2>
+    <p>Validated rows are upserted into DuckDB on the primary key
+    <code>(date, series_id)</code>. Re-running the pipeline updates existing
+    observations in place instead of stacking duplicates. Raw JSON is saved
+    untouched in <code>data/raw/</code> so transform and validate can be replayed
+    without hitting the API again.</p>
+    <p>A failed series still writes to the QA report. The failure is auditable.
+    It is just not in the table a dashboard would read.</p>
+  </section>
+
+  <section class="article-section">
+    <h2>The technical layer</h2>
+    <div class="article-tech-label">For readers who want the mechanics</div>
+
+    <details class="article-details">
+    <summary>Why transform is a pure function</summary>
+    <div class="article-det-body">
+    <p>Extract talks to the network. Load talks to disk. Transform takes a decoded
+    JSON payload and a series ID and returns a three-column DataFrame —
+    <code>date</code>, <code>series_id</code>, <code>value</code> — with no I/O.
+    That is what makes the JSON-to-table logic unit-testable with fixtures instead
+    of a live FRED key.</p>
+    <p>FRED does not stamp <code>series_id</code> onto each observation. The caller
+    that requested the series has to pass it in. Forgetting that would produce a
+    table of anonymous dates, so the transform is also where identity is attached.</p>
+    </div>
+    </details>
+
+    <details class="article-details">
+    <summary>The load rule in one line</summary>
+    <div class="article-det-body">
+    <p>For each series: extract, transform, validate. Then:</p>
+    <p><strong>if every check passed → upsert; else → log the failed check names and skip.</strong></p>
+    <p>The QA report is written either way. The database is not. That split is the
+    whole project. A dashboard that reads DuckDB is reading only series that cleared
+    the gate on that run.</p>
+    </div>
+    </details>
+
+    <details class="article-details">
+    <summary>What the tests actually pin down</summary>
+    <div class="article-det-body">
+    <p>Each check has a passing case and a failing case. Schema fails on a missing
+    column or a string-typed <code>value</code>. Nulls pass when only <code>value</code>
+    is empty, and fail when <code>date</code> is. Continuity fails if two monthly
+    points are January and April (a gap over 45 days). Range fails at 999 against a
+    max of 50. Duplicates fail when the same <code>(date, series_id)</code> appears
+    twice. Range ignores NaN, so a holiday is not an out-of-range event.</p>
+    <p>Those fixtures are the spec. The interactive panel above is the same logic
+    with the numbers filled in.</p>
+    </div>
+    </details>
+
+    <details class="article-details">
+    <summary>What I'd do differently</summary>
+    <div class="article-det-body">
+    <p><strong>Fail a row, not always a whole series.</strong> Today one out-of-range
+    point blocks the entire series from loading. That is conservative and correct
+    for a first gate. A production version would quarantine the bad rows and load
+    the rest, with the report naming which dates were held back.</p>
+    <p><strong>Tighten ranges once I have a history of observed maxima.</strong> The
+    current bounds are “this cannot be real,” not “this is unusual.” Unusual is a
+    different check — a z-score or a month-over-month jump — and it belongs in a
+    second pass, not in the plausibility gate.</p>
+    <p><strong>Run it on a schedule.</strong> The upsert is already idempotent. The
+    missing piece is treating each run as a freshness SLA: if UNRATE has not moved
+    in 45 days, that is a continuity failure worth paging, not just a report line.</p>
+    </div>
+    </details>
+  </section>
+
+  <section class="article-section">
+    <h2>What this case taught me</h2>
+    <p><strong>ETL is extract, transform, validate, then maybe load.</strong> Writing
+    everything that parsed is how bad data becomes a dashboard. The validation step
+    is only a gate if load is allowed to refuse.</p>
+    <p><strong>Not every missing value is the same missing.</strong> A null date
+    breaks the key. A null yield on a market holiday is the source telling the
+    truth. Collapsing those into one “null check” would either fail every daily
+    series or accept broken identities.</p>
+    <p><strong>A bound is a cheaper alarm than a model.</strong> Unemployment cannot
+    be 999. A 90-day hole in a monthly series is not a weekend. Those are the same
+    kind of ceiling I used on campaign profit: if a number is past what the world
+    allows, stop promoting it.</p>
+    <div class="chips article-chips">
+      <span class="chip">ETL</span>
+      <span class="chip">Data quality</span>
+      <span class="chip">FRED API</span>
+      <span class="chip">DuckDB</span>
+      <span class="chip">pytest</span>
+      <span class="chip">Schema validation</span>
+      <span class="chip">Python</span>
+    </div>
+    <p class="article-fine">Figures and rules are from my pipeline on public FRED series.
+    The data source is the Federal Reserve Bank of St. Louis. No API keys are stored
+    in the repository.</p>
+  </section>
+</div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>Based in San Diego, CA · UCSD MS Business Analytics</span>
+    <div class="footer-links">
+      <a href="https://linkedin.com/in/eesha-jagdhane" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://github.com/eeshajagdhane?tab=repositories" target="_blank" rel="noopener">GitHub</a>
+      <a href="mailto:ejagdhane99@gmail.com">Email</a>
+      <a href="../resume.pdf" target="_blank" rel="noopener">Resume</a>
+    </div>
+    <span>© 2026 Eesha Jagdhane</span>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  (function(){
+    var CHECKS={
+      schema:{t:"Schema",
+        b:"Columns must be date (datetime), series_id (string), value (float). A missing column or a value stored as text fails. This is the check that catches a silent API shape change before it becomes a table of strings."},
+      null:{t:"Nulls",
+        b:"Nulls in date or series_id fail — those columns are the identity of a row. Nulls in value pass, and the report records the count and percentage. FRED's \".\" placeholder is already NaN by this point, so a holiday is reported, not rejected."},
+      gap:{t:"Date continuity",
+        b:"Sort the dates and measure the gap to the next one. Daily allows 4 days (weekends pass; a real outage does not). Monthly allows 45. Quarterly allows 100. Unknown frequencies fail, because there is no honest threshold."},
+      range:{t:"Range",
+        b:"Non-null values must sit inside a wide plausibility band. Unemployment 0–50, yields −5–25, GDP at least zero. NaNs are ignored so a missing observation is not an out-of-range event. 999% unemployment fails. 14% does not."},
+      dup:{t:"Duplicates",
+        b:"The grain is (date, series_id). Two rows with the same pair fail. The load step later upserts on that same key — so if duplicates got through, the primary key would be lying about uniqueness."}
+    };
+    var order=["schema","null","gap","range","dup"];
+    var cout=document.getElementById("cout");
+    function show(id){
+      order.forEach(function(k){
+        document.getElementById("c-"+k).setAttribute("aria-pressed", k===id);
+      });
+      var c=CHECKS[id];
+      cout.innerHTML="<strong>"+c.t+".</strong> "+c.b;
+    }
+    order.forEach(function(k){
+      document.getElementById("c-"+k).addEventListener("click",function(){show(k);});
+    });
+    show("schema");
+
+    var DEFS={
+      clean:{label:"Clean monthly UNRATE",
+        rows:[
+          {n:"schema",ok:true,d:"date / series_id / value with correct types"},
+          {n:"null",ok:true,d:"no null keys; 0% value nulls"},
+          {n:"date_continuity",ok:true,d:"monthly gaps under 45 days"},
+          {n:"range",ok:true,d:"values inside [0, 50]"},
+          {n:"duplicate",ok:true,d:"unique (date, series_id)"}
+        ]},
+      vnull:{label:"One missing unemployment print",
+        rows:[
+          {n:"schema",ok:true,d:"shape unchanged"},
+          {n:"null",ok:true,d:"value nulls: 1 (25%). Keys intact — pass, and report it"},
+          {n:"date_continuity",ok:true,d:"dates still monthly"},
+          {n:"range",ok:true,d:"NaN ignored by the range check"},
+          {n:"duplicate",ok:true,d:"still unique keys"}
+        ]},
+      dnull:{label:"Null date on a row",
+        rows:[
+          {n:"schema",ok:true,d:"columns present"},
+          {n:"null",ok:false,d:"unexpected nulls in key columns: date=1"},
+          {n:"date_continuity",ok:true,d:"remaining dates still regular"},
+          {n:"range",ok:true,d:"values in range"},
+          {n:"duplicate",ok:true,d:"keys unique among non-null dates"}
+        ]},
+      gap:{label:"January, then April — two months dropped",
+        rows:[
+          {n:"schema",ok:true,d:"columns present"},
+          {n:"null",ok:true,d:"keys intact"},
+          {n:"date_continuity",ok:false,d:"1 gap exceeds 45d for monthly (≈90d)"},
+          {n:"range",ok:true,d:"values in range"},
+          {n:"duplicate",ok:true,d:"keys unique"}
+        ]},
+      range:{label:"UNRATE printed as 999",
+        rows:[
+          {n:"schema",ok:true,d:"value is still a float"},
+          {n:"null",ok:true,d:"keys intact"},
+          {n:"date_continuity",ok:true,d:"dates monthly"},
+          {n:"range",ok:false,d:"1 value outside [0, 50]. Example: 999"},
+          {n:"duplicate",ok:true,d:"keys unique"}
+        ]},
+      dup:{label:"Same date ingested twice",
+        rows:[
+          {n:"schema",ok:true,d:"columns present"},
+          {n:"null",ok:true,d:"keys intact"},
+          {n:"date_continuity",ok:true,d:"distinct dates still monthly"},
+          {n:"range",ok:true,d:"values in range"},
+          {n:"duplicate",ok:false,d:"2 duplicate (date, series_id) rows"}
+        ]}
+    };
+    var dorder=["clean","vnull","dnull","gap","range","dup"];
+    var led=document.getElementById("ledger"), vd=document.getElementById("verdict");
+    function render(id){
+      dorder.forEach(function(k){
+        document.getElementById("d-"+k).setAttribute("aria-pressed", k===id);
+      });
+      var s=DEFS[id], html="", pass=true;
+      s.rows.forEach(function(r){
+        if(!r.ok) pass=false;
+        html+="<div class='led-row'><span class='led-k'>"+r.n+"</span><span class='led-v'>"+
+          (r.ok?"pass":"fail")+"</span></div>";
+        html+="<div class='led-row'><span class='led-k' style='font-weight:400;color:var(--ink-mute)'>"+
+          r.d+"</span><span class='led-v'></span></div>";
+      });
+      html+="<div class='led-row tot'><span>Load into DuckDB?</span><span class='led-v'>"+
+        (pass?"yes":"no")+"</span></div>";
+      led.innerHTML=html;
+      vd.innerHTML=pass
+        ? "<span class='badge yes'>Load</span><br>Every check passed. <strong>"+s.label+"</strong> is upserted and the QA report marks PASS."
+        : "<span class='badge no'>Skip</span><br><strong>"+s.label+"</strong> is written to the QA report and <em>not</em> loaded. The dashboard never sees it.";
+    }
+    dorder.forEach(function(k){
+      document.getElementById("d-"+k).addEventListener("click",function(){render(k);});
+    });
+    render("clean");
+  })();
+</script>
+
+
+
+
+
+
+</body></html>
