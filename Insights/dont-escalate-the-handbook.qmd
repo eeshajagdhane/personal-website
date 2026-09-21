@@ -1,0 +1,333 @@
+---
+pagetitle: "Don't escalate the handbook"
+---
+
+```{=html}
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="../index.html" class="brand">EJ.</a>
+    <ul class="nav-links">
+      <li><a href="../about.html">About</a></li>
+      <li><a href="../experience.html">Experience</a></li>
+      <li><a href="../projects.html">Projects</a></li>
+      <li><a href="../hobbies.html">Hobbies</a></li>
+      <li><a href="../insights.html" class="active">Insights</a></li>
+    </ul>
+    <a href="../contact.html" class="btn-dark">Get in touch</a>
+  </div>
+</nav>
+
+<main>
+<div class="page page-article reveal">
+  <a href="../insights.html" class="arrow-link article-back">← Insights</a>
+
+  <div class="eyebrow page-eyebrow">Operations · Build</div>
+  <h1 class="page-title">Don't escalate the handbook</h1>
+  <p class="article-deck">
+    I stacked a café operations console in four layers — plan and data, skill
+    contracts, tools and RAG, then a review UI. The extract is a drink order.
+    The point is the gate: a customer-facing recommendation does not move until
+    a human says so, and a safety detector that reads the handbook will
+    <em>escalate the handbook</em>.
+  </p>
+
+  <dl class="article-meta">
+    <div><dt>Role</dt><dd>Builder</dd></div>
+    <div><dt>Case</dt><dd>Café operations console</dd></div>
+    <div><dt>Stack</dt><dd>Python · Flask · RAG · pytest</dd></div>
+    <div><dt>Date</dt><dd>August 20, 2026</dd></div>
+  </dl>
+  <p><a href="https://github.com/eeshajagdhane/brewflow-ai" class="arrow-link" target="_blank" rel="noopener">View on GitHub →</a></p>
+
+  <section class="article-section">
+    <h2>The problem</h2>
+    <p>A barista already does the work: check the case, glance at the schedule,
+    guess the rush, recommend something in stock, catch a missing size, and
+    notice the word “allergy.” The pieces exist. They just live in different
+    heads, binders, and walks to the back.</p>
+    <p>I wanted one console for those three moments in a shift — manager
+    readiness, a drink recommendation, and an order that is complete before it
+    is built — with evidence attached and a human still in the way of anything
+    a customer hears. I built it with teammates. The current example uses the
+    public Starbucks menu plus simulated store data. No proprietary operations
+    data is in the repository.</p>
+  </section>
+
+  <div class="article-stats">
+    <div class="article-stat"><div class="article-stat-v">4</div><div class="article-stat-l">Layers stacked</div></div>
+    <div class="article-stat"><div class="article-stat-v">6</div><div class="article-stat-l">Callable tools</div></div>
+    <div class="article-stat"><div class="article-stat-v">12</div><div class="article-stat-l">SOP and policy docs</div></div>
+    <div class="article-stat"><div class="article-stat-v">95</div><div class="article-stat-l">Local tests, no keys</div></div>
+  </div>
+
+  <section class="article-section">
+    <h2>Four layers, one console</h2>
+    <p>Each layer sat on the last. The UI is the surface, not the system.
+    Select a layer to see what it actually added.</p>
+  </section>
+
+  <div class="article-panel">
+    <div class="article-panel-head">
+      <div>
+        <div class="article-panel-title">What each layer is for</div>
+        <div class="article-panel-sub">The interesting design is not “add an LLM.” It is what the coworker is not allowed to do.</div>
+      </div>
+    </div>
+    <div class="article-seg" role="group" aria-label="Layer">
+      <button id="c-plan" aria-pressed="true">Plan + data</button>
+      <button id="c-skills" aria-pressed="false">Skills</button>
+      <button id="c-tools" aria-pressed="false">Tools + RAG</button>
+      <button id="c-ui" aria-pressed="false">Console</button>
+    </div>
+    <div class="article-qout" id="cout"></div>
+  </div>
+
+  <section class="article-section">
+    <h2>The detector was reading the handbook</h2>
+    <p>Allergy language always escalates. That rule is correct. The first
+    version of the check scanned the whole workflow output, including RAG
+    filenames and snippets. The file <code>dietary_allergen_guidance.md</code>
+    contains the word <em>allergen</em>. A dairy-free request retrieved that
+    file. The detector treated the handbook as the customer.</p>
+    <p>Benign drinks were routed to “escalate to allergen review.” Real
+    allergies were still caught — and so was every request that happened to
+    pull the policy doc. Alert fatigue is how a safety rule dies.</p>
+  </section>
+
+  <div class="article-panel">
+    <div class="article-panel-head">
+      <div>
+        <div class="article-panel-title">Should this escalate?</div>
+        <div class="article-panel-sub">Same rules as the tests. The old scan read the handbook. The current scan reads the customer.</div>
+      </div>
+    </div>
+    <div class="article-seg" role="group" aria-label="Request">
+      <button id="d-clean" aria-pressed="true">Iced latte</button>
+      <button id="d-dairy" aria-pressed="false">Dairy-free, no allergy</button>
+      <button id="d-allergy" aria-pressed="false">Nut allergy</button>
+    </div>
+    <div class="ledger" id="ledger"></div>
+    <div class="verdict" id="verdict"></div>
+  </div>
+
+  <section class="article-section">
+    <div class="article-callout">
+      <p>The fix is a smaller scan, not a weaker rule. Face validity now
+      reads the customer's words, the warnings, and the review-queue labels.
+      It does not stringify RAG metadata. Real allergy language still forces
+      <code>needs_review</code> and <code>escalate</code>. The handbook does
+      not.</p>
+    </div>
+    <p>Customer-facing steps are designed to land in <strong>needs_review</strong>.
+    That is not a failed run. Approve, Edit, Reject + Rerun, and Escalate are
+    part of the process. The console records those actions in an audit log.
+    Reject + Rerun does not yet feed a corrected input back into the
+    orchestrator — the button is a log entry, not a loop.</p>
+  </section>
+
+  <section class="article-section">
+    <h2>What a run actually does</h2>
+    <p>Manager readiness aggregates rush, staffing, inventory, and promotions
+    into one briefing. A recommendation scores the menu against preferences,
+    down-ranks anything whose key ingredient is low, and retrieves policy
+    docs. The order builder parses size, temperature, milk, and extras,
+    then asks a follow-up when a field is missing.</p>
+    <p>No LLM runs at serving time. Tools are Python functions. RAG is
+    keyword scoring over twelve markdown files. Tests run offline. The
+    skill files describe the spoken recommendation those tools would feed;
+    the console currently shows the structured envelope instead.</p>
+  </section>
+
+  <section class="article-section">
+    <h2>The technical layer</h2>
+    <div class="article-tech-label">For readers who want the mechanics</div>
+
+    <details class="article-details">
+    <summary>Why skills are contracts, not the runtime</summary>
+    <div class="article-det-body">
+    <p>Each <code>SKILL.md</code> says when to recommend, which tools to call,
+    which SOP to retrieve, and what the spoken line should contain. The
+    orchestrator does not load those files. It calls the tools and RAG
+    itself and returns JSON the UI can render. That is honest: the contracts
+    are the design; the running path is tools plus retrieval plus a human
+    gate.</p>
+    <p>Wiring a skill adapter later is a thin generation step on top of the
+    same envelope. The gate stays. The model, if it ever speaks, still cannot
+    skip Approve.</p>
+    </div>
+    </details>
+
+    <details class="article-details">
+    <summary>What the allergy scan is allowed to read</summary>
+    <div class="article-det-body">
+    <p>The old check stringified <code>final_output</code>. That object embeds
+    retrieved document titles and snippets, so a filename with “allergen” in
+    it was indistinguishable from the customer typing the word. Two
+    regression tests now pin the split: a benign dairy-free request must not
+    escalate, and a request that says “nut allergy” must.</p>
+    <p>Warnings and review-queue labels are still in the scan, because the
+    orchestrator already copies a real allergy hit into those fields. The
+    handbook never should have been a signal.</p>
+    </div>
+    </details>
+
+    <details class="article-details">
+    <summary>What the tests actually pin down</summary>
+    <div class="article-det-body">
+    <p>Ninety-five tests, all local. Tools, retrieval, four orchestrator
+    workflows, face validity, and Flask routes. A missing size produces a
+    follow-up question. Stale inventory falls back to the latest prior
+    snapshot and says so. Dairy-free search uses a vegan heuristic and
+    labels it as a heuristic. Prep notes always include “prepared
+    individually.”</p>
+    <p>The suite is the spec. The panels above are the same rules with the
+    numbers filled in.</p>
+    </div>
+    </details>
+
+    <details class="article-details">
+    <summary>What I'd do differently</summary>
+    <div class="article-det-body">
+    <p><strong>Close the review loop.</strong> Reject + Rerun should send
+    corrected input back through the orchestrator. A button that only writes
+    to a log is not a loop.</p>
+    <p><strong>Keep session state for missing fields.</strong> The order
+    builder already asks “What size?” The answer should complete the same
+    order instead of starting a new run.</p>
+    <p><strong>Speak from the skill contract only after the tools have
+    gated.</strong> Natural-language confirmation is useful. It is not a
+    substitute for the structured parse, the inventory check, or Approve.</p>
+    </div>
+    </details>
+  </section>
+
+  <section class="article-section">
+    <h2>What this case taught me</h2>
+    <p><strong>Stack the process before you stack the model.</strong> Plan,
+    contracts, tools, then a console. Each layer has a job. Skipping to a
+    chatbot would have hidden whether inventory, rush, and allergy rules
+    actually fired.</p>
+    <p><strong>A safety detector that reads the handbook will escalate the
+    handbook.</strong> The word “allergen” in a policy filename is not a
+    customer risk. Scanning the customer's words is. Those have to be
+    different inputs.</p>
+    <p><strong>Needs-review is a designed state, not a failure.</strong> If
+    the coworker can talk to a customer without Approve, the evidence package
+    is decoration. The gate is only a gate if load — here, speech — is
+    allowed to refuse.</p>
+    <div class="chips article-chips">
+      <span class="chip">Process design</span>
+      <span class="chip">Human review</span>
+      <span class="chip">RAG</span>
+      <span class="chip">MCP tools</span>
+      <span class="chip">Face validity</span>
+      <span class="chip">Flask</span>
+      <span class="chip">Python</span>
+    </div>
+    <p class="article-fine">Built with teammates. Menu items are from the public
+    Starbucks catalog; inventory, staffing, and sales files are simulated.
+    No proprietary store data and no API keys are stored in the repository.</p>
+  </section>
+</div>
+</main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <span>Based in San Diego, CA · UCSD MS Business Analytics</span>
+    <div class="footer-links">
+      <a href="https://linkedin.com/in/eesha-jagdhane" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://github.com/eeshajagdhane?tab=repositories" target="_blank" rel="noopener">GitHub</a>
+      <a href="mailto:ejagdhane99@gmail.com">Email</a>
+      <a href="../resume.pdf" target="_blank" rel="noopener">Resume</a>
+    </div>
+    <span>© 2026 Eesha Jagdhane</span>
+  </div>
+</footer>
+
+<script>
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+  }, { threshold: 0.08 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  (function(){
+    var LAYERS={
+      plan:{t:"Plan and data",
+        b:"Map the shift. Decide what an AI coworker may not do — it does not skip allergy review, it does not batch drinks, it does not speak to a customer unapproved. Invent the simulated store CSVs. The public menu is the catalog; operations are synthetic on purpose."},
+      skills:{t:"Skill contracts",
+        b:"Write when to recommend, how to parse an order, and what a confirmation must say. Those live as SKILL.md files. They are the design. The running console does not execute them; it runs the tools those contracts name."},
+      tools:{t:"Tools and RAG",
+        b:"Six callable Python functions (menu, preference search, inventory, rush, staffing, order parse) and twelve SOP/policy docs retrieved by keyword score. No vector database. No API key. This is the layer that actually fires on every run."},
+      ui:{t:"Console",
+        b:"A Flask UI over the orchestrator: manager briefing, recommendation, order builder, evidence center, review queue, audit log. Approve / Edit / Reject + Rerun / Escalate are visible. Customer-facing output is designed to sit in needs_review until a human acts."}
+    };
+    var lorder=["plan","skills","tools","ui"];
+    var cout=document.getElementById("cout");
+    function show(id){
+      lorder.forEach(function(k){
+        document.getElementById("c-"+k).setAttribute("aria-pressed", k===id);
+      });
+      var c=LAYERS[id];
+      cout.innerHTML="<strong>"+c.t+".</strong> "+c.b;
+    }
+    lorder.forEach(function(k){
+      document.getElementById("c-"+k).addEventListener("click",function(){show(k);});
+    });
+    show("plan");
+
+    var DEFS={
+      clean:{label:"Grande iced latte",
+        rows:[
+          {n:"customer text",ok:true,d:"no allergy or medical language"},
+          {n:"RAG retrieved",ok:true,d:"order confirmation SOP — not scanned"},
+          {n:"old scan (output)",ok:true,d:"would also pass — handbook not in the blob"},
+          {n:"current scan",ok:true,d:"customer words + warnings + review labels"}
+        ],
+        escalate:false,
+        note:"No allergy language. Recommendation still sits in needs_review for human approval, but it is not an allergen escalation."},
+      dairy:{label:"Dairy-free, no allergy mentioned",
+        rows:[
+          {n:"customer text",ok:true,d:"dietary preference only"},
+          {n:"RAG retrieved",ok:true,d:"dietary_allergen_guidance.md contains “allergen”"},
+          {n:"old scan (output)",ok:false,d:"filename leaked into the detector → false escalate"},
+          {n:"current scan",ok:true,d:"handbook excluded; request stays a review, not an emergency"}
+        ],
+        escalate:false,
+        note:"The old detector escalated this. The current one does not. Approve is still required before the customer hears it."},
+      allergy:{label:"I have a nut allergy",
+        rows:[
+          {n:"customer text",ok:false,d:"allergy language in the request"},
+          {n:"RAG retrieved",ok:true,d:"allergen guidance, as expected"},
+          {n:"old scan (output)",ok:false,d:"escalate — for the right reason, and also the filename"},
+          {n:"current scan",ok:false,d:"escalate from the customer's words"}
+        ],
+        escalate:true,
+        note:"Real allergy language still forces needs_review and escalate. The rule did not get weaker. The input got smaller."}
+    };
+    var dorder=["clean","dairy","allergy"];
+    var led=document.getElementById("ledger"), vd=document.getElementById("verdict");
+    function render(id){
+      dorder.forEach(function(k){
+        document.getElementById("d-"+k).setAttribute("aria-pressed", k===id);
+      });
+      var s=DEFS[id], html="";
+      s.rows.forEach(function(r){
+        html+="<div class='led-row'><span class='led-k'>"+r.n+"</span><span class='led-v'>"+
+          (r.ok?"clear":"flag")+"</span></div>";
+        html+="<div class='led-row'><span class='led-k' style='font-weight:400;color:var(--ink-mute)'>"+
+          r.d+"</span><span class='led-v'></span></div>";
+      });
+      html+="<div class='led-row tot'><span>Escalate as allergy?</span><span class='led-v'>"+
+        (s.escalate?"yes":"no")+"</span></div>";
+      led.innerHTML=html;
+      vd.innerHTML=s.escalate
+        ? "<span class='badge no'>Escalate</span><br><strong>"+s.label+"</strong> — "+s.note
+        : "<span class='badge yes'>Review, don't escalate</span><br><strong>"+s.label+"</strong> — "+s.note;
+    }
+    dorder.forEach(function(k){
+      document.getElementById("d-"+k).addEventListener("click",function(){render(k);});
+    });
+    render("clean");
+  })();
+</script>
+```
