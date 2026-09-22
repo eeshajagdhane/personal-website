@@ -24,7 +24,7 @@ pagetitle: "Experience"
 
   <div class="timeline">
     <div class="tl-item">
-      <div class="tl-when">Sep 2026 — Present</div>
+      <div class="tl-when">Jun 2026 — Present</div>
       <div class="tl-title">AI and Data Product Engineer</div>
       <div class="tl-org">361Firm — New York, NY</div>
       <div class="tl-desc">

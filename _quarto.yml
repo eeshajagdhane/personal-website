@@ -1,6 +1,8 @@
 project:
   type: website
   output-dir: docs
+  resources:
+    - resume.pdf
   render:
     - "*.qmd"
     - "Insights/*.qmd"
